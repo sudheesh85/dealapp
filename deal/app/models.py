@@ -51,9 +51,10 @@ class User(models.Model):
     email = models.CharField(max_length=100, blank=True)
     gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     dob=models.DateField(null=True)
-    mobile = models.BigIntegerField(unique=True, blank=True) 
+    mobile = models.BigIntegerField(unique=True, blank=True)
     otp=models.CharField(max_length=6,null=True,blank=True)
     otp_exp_time=models.DateTimeField(blank=True,default=now)
+    is_otp_verified=models.NullBooleanField(default=False)
     device_token=models.CharField(max_length=100,blank=True,default='')
     choice=Interest.objects.all()#.values('category_name')
     ch_list=[]

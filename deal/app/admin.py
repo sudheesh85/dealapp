@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from .models import User,Interest,ServiceLoc #,User_Interest
 from .forms import UserInterestForm
 from multiselectfield import MultiSelectFormField
+from .sms import sms
 #import pyotp
 #from django import forms
 # Register your models here.
@@ -57,15 +58,21 @@ class UserAdmin(admin.ModelAdmin):
     def Interest(self,obj):
         return obj.interest
 
-    '''@receiver(post_save, sender=User)
+    @receiver(post_save, sender=User)
     def my_handler(sender,**kwargs):
         #print("saved successfully")
-        user=User.objects.all()[0]
-        print(user.userCD)
-        totp=pyotp.TOTP('base32secret3232')
-        user.otp=totp.now()
-        User.objects.filter(userCD=user.userCD).update(otp=user.otp)
-        #return user'''
+        user=User.objects.filter(userCD='CE5JKy')[0]
+        print(user.name)
+        ph=user.mobile
+        otp=user.otp
+        #totp=pyotp.TOTP('base32secret3232')
+        #user.otp=totp.now()
+        if not user.is_otp_verified:
+            sms.sendMsg(ph,otp)
+            User.objects.filter(userCD='CE5JKy').update(is_otp_verified=True)
+        else:
+            print("User Already verified")
+        #return user
         
         
 
