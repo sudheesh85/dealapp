@@ -4,8 +4,8 @@ from twilio.rest import Client
 class Message:
     def sendMsg(self,ph,otp):
 # Your Account Sid and Auth Token from twilio.com/user/account
-        account_sid = "AC5c5132ae7e3856c21722097bc6af6873"
-        auth_token  = "ee19e242b9694edeb8e701a7854d7e0a"
+        account_sid = "12345"
+        auth_token  = "xxxxx"
         #client = TwilioRestClient(account_sid, auth_token)
         client = Client(account_sid, auth_token)
 
