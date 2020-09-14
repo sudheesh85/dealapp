@@ -39,7 +39,13 @@ class ServiceLoc(models.Model):
         return self.location
 
 class Vendor(models.Model):
-    pass
+    phone_number=models.CharField(max_length=10,unique=True, blank=True)
+    description=models.TextField(blank=True)
+    totalDeals=models.CharField(max_length=5,blank=True)
+    totalActiveDeals=models.CharField(max_length=5,blank=True)
+    numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
+    totalCollectedDeals=models.CharField(max_length=5,blank=True)
+    #pass
 
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
