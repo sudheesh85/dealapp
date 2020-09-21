@@ -39,13 +39,22 @@ class ServiceLoc(models.Model):
         return self.location
 
 class Vendor(models.Model):
+    vendor_id=models.IntegerField()
+    vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
     numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
     totalCollectedDeals=models.CharField(max_length=5,blank=True)
-    #pass
+    
+    @property
+    def vendor_id(self):
+       return self.id+100
+
+    def __str__(self):
+        return self.vendor_name
+
 
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
@@ -75,6 +84,12 @@ class User(models.Model):
     for loc in all_loc:
         loc_list.append([loc.location,loc.location])
     serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
+    vendor=Vendor.objects.all()
+    vlist=[]
+    for vndr in vendor:
+        vlist.append([vndr.vendor_name,vndr.vendor_name])
+    interested_vendors=MultiSelectField(choices=vlist,default='',blank=True)
+    #vendor_is_followed=models.NullBooleanField(default=False)
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
            if self.pk is None:

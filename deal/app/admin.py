@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import User,Interest,ServiceLoc #,User_Interest
+from .models import User,Interest,ServiceLoc,Vendor#,User_Interest
 from .forms import UserInterestForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -31,7 +31,10 @@ class InterestAdmin(admin.ModelAdmin):
     pass
 class ServiceLocAdmin(admin.ModelAdmin):
     exclude=('loc_id',)
+    #pass
+class VendorAdmin(admin.ModelAdmin):
     pass
+
 class UserAdmin(admin.ModelAdmin):
     exclude = ('created_at','userCD')   # exclude list of fields those not display in admin form
     # fields = ('name', 'address', 'gender','age')  # list of fields display in admin form
@@ -39,7 +42,7 @@ class UserAdmin(admin.ModelAdmin):
     sortable_by = 'id'  # field 'id' sorted by descending order
     #date_hierarchy = 'created_at'  # field 'created_at' as date field display as descending order
     search_fields = ['name','nick_name']#,'city','mobile']  # list of fields search in admin table
-    list_display = ('name','serviceLoc','mobile','Interest')#'city','email','gender','mobile') # list of fields display in admin table
+    list_display = ('name','serviceLoc','mobile','Interest','Following')#'city','email','gender','mobile') # list of fields display in admin table
     list_display_links = ('name',)#city')  # list of fields display in table show as link
     # list_select_related = ('type',)  # select_related in added only foreign key fields for query performance
     # raw_id_fields = ('product','type') # perfetch_related in added only manytomany fields for query performance
@@ -57,6 +60,8 @@ class UserAdmin(admin.ModelAdmin):
     # manytomany fields display in admin table and multiple value separate by comma
     def Interest(self,obj):
         return obj.interest
+    def Following(self,obj):
+        return obj.interested_vendors
 
     @receiver(post_save, sender=User)
     def my_handler(sender,**kwargs):
@@ -115,7 +120,7 @@ admin.site.unregister(Group)
 admin.site.register(User, UserAdmin)
 admin.site.register(Interest,InterestAdmin)
 admin.site.register(ServiceLoc,ServiceLocAdmin)
-#admin.site.register(User_Interest,User_InterestAdmin)
+admin.site.register(Vendor,VendorAdmin)
 
 
 # admin header and title modification
