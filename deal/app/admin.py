@@ -9,6 +9,7 @@ from .models import User,Interest,ServiceLoc,Vendor#,User_Interest
 from .forms import UserInterestForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
+from .fcm import FCM
 #import pyotp
 #from django import forms
 # Register your models here.
@@ -67,6 +68,7 @@ class UserAdmin(admin.ModelAdmin):
     def my_handler(sender,**kwargs):
         #print("saved successfully")
         user=User.objects.filter(userCD='CE5JKy')[0]
+        data={"Name":user.name}
         print(user.name)
         ph=user.mobile
         otp=user.otp
@@ -77,6 +79,7 @@ class UserAdmin(admin.ModelAdmin):
             User.objects.filter(userCD='CE5JKy').update(is_otp_verified=True)
         else:
             print("User Already verified")
+        print(FCM.send_notification(user,"User creation","user created successfully",data))
         #return user
         
         
