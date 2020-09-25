@@ -83,13 +83,32 @@ WSGI_APPLICATION = 'deal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
+'''DATABASES = {
     'default': {
         'ENGINE': 'djongo',#'django.db.backends.sqlite3',
         'NAME':'admin',
         'host':'mongodb://127.0.0.1',
         'port':27017,
     }
+}'''
+DATABASES = {
+
+    'default': {
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': 'sample',
+
+        'USER': 'postgres',
+
+        'PASSWORD': 'admin',
+
+        'HOST': '127.0.0.1',
+
+        'PORT': '5432',
+
+    }
+
 }
 
 

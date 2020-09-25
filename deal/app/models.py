@@ -1,6 +1,7 @@
 
+from django.db import models
 from django.utils.timezone import now
-from djongo import models
+#from djongo import models
 from django.utils.crypto import get_random_string
 from .userid_gen import uid,otp
 from django import forms
@@ -32,8 +33,9 @@ class Interest(models.Model):
 class ServiceLoc(models.Model):
     loc_id=models.IntegerField()
     location=models.CharField(max_length=50,null=True)
-    '''def loc_id(self):
-       return self.id+100'''
+    @property
+    def loc_id(self):
+        return self.id+100
     
     def __str__(self):
         return self.location
@@ -105,18 +107,18 @@ class User(models.Model):
         return self.name
 # Create your models here.
 
-'''class User_Interest(models.Model):
+#class User_Interest(models.Model):
     
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
+#    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
     #category_id=models.ForeignKey(Interest,on_delete=models.CASCADE)
-    choice=Interest.objects.all()#.values('category_id')
-    ch_list=[]
-    for ch in choice:
-        ch_list.append([ch.category_name,ch.category_name])
-    interest=MultiSelectField(choices=ch_list,min_choices=3,default='',blank=True)
-    #print(type(interest))
+ #   choice=Interest.objects.all()#.values('category_id')
+ #   ch_list=[]
+ #   for ch in choice:
+ #       ch_list.append([ch.category_name,ch.category_name])
+ #   interest=MultiSelectField(choices=ch_list,min_choices=3,default='',blank=True)
+ #   #print(type(interest))
     
-    def __str__(self):
-        return str(self.interest)'''
+ #   def __str__(self):
+  #      return str(self.interest)'''
 
 

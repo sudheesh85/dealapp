@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import User,Interest,ServiceLoc,Vendor#,User_Interest
+from .models import Interest,User,ServiceLoc,Vendor#,User_Interest
 from .forms import UserInterestForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -64,7 +64,7 @@ class UserAdmin(admin.ModelAdmin):
     def Following(self,obj):
         return obj.interested_vendors
 
-    @receiver(post_save, sender=User)
+    '''@receiver(post_save, sender=User)
     def my_handler(sender,**kwargs):
         #print("saved successfully")
         user=User.objects.filter(userCD='CE5JKy')[0]
@@ -80,12 +80,12 @@ class UserAdmin(admin.ModelAdmin):
         else:
             print("User Already verified")
         print(FCM.send_notification(user,"User creation","user created successfully",data))
-        #return user
+        #return user'''
         
         
 
 
-'''class User_InterestAdmin(admin.ModelAdmin):
+'''lass User_InterestAdmin(admin.ModelAdmin):
     #exclude = ('category_id',)#'user_interest')
     list_display=('userCD','get_interest')
     #list_display_links=('userCD',)
