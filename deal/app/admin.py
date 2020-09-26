@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,ServiceLoc,Vendor#,User_Interest
+from .models import Interest,User,ServiceLoc,Vendor,Device
 from .forms import UserInterestForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -34,6 +34,8 @@ class ServiceLocAdmin(admin.ModelAdmin):
     exclude=('loc_id',)
     #pass
 class VendorAdmin(admin.ModelAdmin):
+    pass
+class DeviceAdmin(admin.ModelAdmin):
     pass
 
 class UserAdmin(admin.ModelAdmin):
@@ -81,41 +83,7 @@ class UserAdmin(admin.ModelAdmin):
             print("User Already verified")
         print(FCM.send_notification(user,"User creation","user created successfully",data))
         #return user'''
-        
-        
 
-
-'''lass User_InterestAdmin(admin.ModelAdmin):
-    #exclude = ('category_id',)#'user_interest')
-    list_display=('userCD','get_interest')
-    #list_display_links=('userCD',)
-    #change_list_template = 'admin/interest.html'
-    form=UserInterestForm
-    def get_interest(self,obj):
-        #intr=User_Interest.objects.all().values('interest')
-        #print(obj.userCD)
-        intr=User_Interest.objects.all().last()
-        print(obj.userCD,obj.interest)
-        if intr.userCD == obj.userCD:
-            usr_interest=obj.interest
-        #print(usr_interest)
-        for i in obj.interest:
-            if i not in intr.interest:
-                print("Entering")
-                intr.interest.append(i)
-        intr.save()
-        return obj.interest
-    def category(self,obj):
-        intr=User_Interest.objects.all().values('interest')
-        cat=Interest.objects.all().values('category_id')
-
-        for i in intr:
-            User_Interest.category_id=Interest.objects.only(cat).get(category_name=i)'''
-        
-        
-            
-        
-  
 # unregister app
 admin.site.unregister(Group)
 
@@ -124,6 +92,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Interest,InterestAdmin)
 admin.site.register(ServiceLoc,ServiceLocAdmin)
 admin.site.register(Vendor,VendorAdmin)
+admin.site.register(Device,DeviceAdmin)
 
 
 # admin header and title modification

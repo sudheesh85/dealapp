@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.utils.timezone import now
 #from djongo import models
 from django.utils.crypto import get_random_string
@@ -18,6 +19,10 @@ USER_STATUS= (
     ('ACTIVE','ACTIVE'),
     ('INACTIVE','INACTIVE'),
     ('SUSPENDED','SUSPENDED')
+)
+DEVICE_TYPE=(
+    ('{ANDROID}','{ANDROID}'),
+    ('{iOS}','{iOS}')
 )
 
 class Interest(models.Model):
@@ -72,7 +77,7 @@ class User(models.Model):
     otp=models.CharField(max_length=6,null=True,blank=True)
     otp_exp_time=models.DateTimeField(blank=True,default=now)
     is_otp_verified=models.NullBooleanField(default=False)
-    device_token=models.CharField(max_length=100,blank=True,default='')
+    #device_token=models.CharField(max_length=100,blank=True,default='')
     choice=Interest.objects.all()#.values('category_name')
     ch_list=[]
     for ch in choice:
@@ -106,6 +111,16 @@ class User(models.Model):
     def __str__(self):
         return self.name
 # Create your models here.
+
+class Device(models.Model):
+    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
+    device_token=ArrayField(models.CharField(max_length=256),blank=True)
+    device_type=ArrayField(models.TextField(choices=DEVICE_TYPE,default=''))
+    device_id=models.CharField(max_length=20,blank=True)
+
+    def __str__(self):
+        return str(self.userCD)
+
 
 #class User_Interest(models.Model):
     
