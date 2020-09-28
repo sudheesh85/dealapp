@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,ServiceLoc,Vendor,Device
+from .models import Interest,User,ServiceLoc,Vendor,Device,Global
 from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -27,7 +27,12 @@ from .fcm import FCM
 
 #def categories(instance):
     #return ', '.join(instance.categories)
-
+@admin.register(Global)
+class GlobalAdmin(admin.ModelAdmin):
+    list_display = ('OTP_EXP_TIME',)
+    def OTP_EXP_TIME(self,obj):
+        return obj.EXP_TIME
+    #pass
 class InterestAdmin(admin.ModelAdmin):
     #list_display=('category_name',)
     #list_display_links = ('category_name',)

@@ -119,6 +119,11 @@ class Device(models.Model):
 
     def __str__(self):
         return str(self.userCD)
+class Global(models.Model):
+    EXP_TIME=models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.EXP_TIME)
 
 
 #class User_Interest(models.Model):
