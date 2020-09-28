@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.postgres.fields import JSONField
+from prettyjson import PrettyJSONWidget
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -6,7 +8,7 @@ from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from .models import Interest,User,ServiceLoc,Vendor,Device
-from .forms import UserInterestForm
+from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
 from .fcm import FCM
@@ -16,15 +18,15 @@ from .fcm import FCM
 
 
 # Admin Action Functions to update all employee gender as Male
-'''def update_gender_all(modeladmin, request, queryset):
-    queryset.update(gender='Male')
+#def update_gender_all(modeladmin, request, queryset):
+ #   queryset.update(gender='Male')
 
 
 # Action description
-update_gender_all.short_description = "Mark Selected Gender update as Male"
+#update_gender_all.short_description = "Mark Selected Gender update as Male"
 
 #def categories(instance):
-    #return ', '.join(instance.categories)'''
+    #return ', '.join(instance.categories)
 
 class InterestAdmin(admin.ModelAdmin):
     #list_display=('category_name',)
@@ -35,8 +37,22 @@ class ServiceLocAdmin(admin.ModelAdmin):
     #pass
 class VendorAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
-    pass
+    list_display=('userCD','Device_dtl')
+    form = DeviceForm
+
+    def Device_dtl(self,obj):
+        return obj.device
+'''class DeviceAdmin(admin.ModelAdmin):
+    list_display=('userCD','Device_dtl',)
+    form = DeviceModelForm
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget }
+    }
+    def Device_dtl(self,obj):
+        return obj.device'''
 
 class UserAdmin(admin.ModelAdmin):
     exclude = ('created_at','userCD')   # exclude list of fields those not display in admin form
@@ -65,6 +81,7 @@ class UserAdmin(admin.ModelAdmin):
         return obj.interest
     def Following(self,obj):
         return obj.interested_vendors
+    
 
     '''@receiver(post_save, sender=User)
     def my_handler(sender,**kwargs):
@@ -92,7 +109,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Interest,InterestAdmin)
 admin.site.register(ServiceLoc,ServiceLocAdmin)
 admin.site.register(Vendor,VendorAdmin)
-admin.site.register(Device,DeviceAdmin)
+#admin.site.register(Device,DeviceAdmin)
 
 
 # admin header and title modification

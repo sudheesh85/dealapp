@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField,JSONField
 from django.utils.timezone import now
 #from djongo import models
 from django.utils.crypto import get_random_string
@@ -114,9 +114,8 @@ class User(models.Model):
 
 class Device(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    device_token=ArrayField(models.CharField(max_length=256),blank=True)
-    device_type=ArrayField(models.TextField(choices=DEVICE_TYPE,default=''))
-    device_id=models.CharField(max_length=20,blank=True)
+    device=JSONField()
+  
 
     def __str__(self):
         return str(self.userCD)
@@ -134,6 +133,8 @@ class Device(models.Model):
  #   #print(type(interest))
     
  #   def __str__(self):
-  #      return str(self.interest)'''
+  #      return str(self.interest)
+  # 
+
 
 

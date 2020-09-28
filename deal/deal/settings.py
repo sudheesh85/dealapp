@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     #'django_otp.plugins.otp_hotp',
     #'django_otp.plugins.otp_static',
     'app',
+    'prettyjson',
 ]
 
 MIDDLEWARE = [
@@ -97,7 +98,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'sample',
+        'NAME': 'deal',
 
         'USER': 'postgres',
 
