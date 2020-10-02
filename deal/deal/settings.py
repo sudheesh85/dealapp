@@ -41,13 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'multiselectfield',
-    #'django_otp',
-    #'django_otp.plugins.otp_totp',
-    #'django_otp.plugins.otp_hotp',
-    #'django_otp.plugins.otp_static',
+    'graphene_django',
+    'django_filters',
     'app',
     'prettyjson',
 ]
+GRAPHENE={
+    'SCHEMA':'app.schema.schema'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

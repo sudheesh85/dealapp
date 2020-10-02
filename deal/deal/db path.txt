@@ -1,1 +1,5 @@
 export PATH=/Library/PostgreSQL/12/bin/:${PATH}
+
+python manage.py changepassword sudheesh85
+
+azure postgres ip 52.171.49.18
