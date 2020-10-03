@@ -88,7 +88,7 @@ class UserAdmin(admin.ModelAdmin):
         return obj.interested_vendors
     
 
-    '''@receiver(post_save, sender=User)
+    ''' @receiver(post_save, sender=User)
     def my_handler(sender,**kwargs):
         #print("saved successfully")
         user=User.objects.filter(userCD='CE5JKy')[0]
@@ -103,8 +103,8 @@ class UserAdmin(admin.ModelAdmin):
             User.objects.filter(userCD='CE5JKy').update(is_otp_verified=True)
         else:
             print("User Already verified")
-        print(FCM.send_notification(user,"User creation","user created successfully",data))
-        #return user'''
+        print(FCM.send_notification(user,"User creation","user created successfully",data))'''
+        #return user
 
 # unregister app
 admin.site.unregister(Group)

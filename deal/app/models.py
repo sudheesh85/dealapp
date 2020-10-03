@@ -1,6 +1,7 @@
 
 from django.db import models
-from django.contrib.postgres.fields import ArrayField,JSONField
+from django.db.models import JSONField
+from django.contrib.postgres.fields import ArrayField #,JSONField
 from django.utils.timezone import now
 #from djongo import models
 from django.utils.crypto import get_random_string
@@ -76,7 +77,7 @@ class User(models.Model):
     mobile = models.CharField(max_length=12,unique=True, blank=True)
     otp=models.CharField(max_length=6,null=True,blank=True)
     otp_exp_time=models.DateTimeField(blank=True,default=now)
-    is_otp_verified=models.NullBooleanField(default=False)
+    is_otp_verified=models.BooleanField(null=True,default=False)
     #device_token=models.CharField(max_length=100,blank=True,default='')
     choice=Interest.objects.all()#.values('category_name')
     ch_list=[]

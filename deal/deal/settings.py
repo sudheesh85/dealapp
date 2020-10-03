@@ -46,9 +46,9 @@ INSTALLED_APPS = [
     'app',
     'prettyjson',
 ]
-GRAPHENE={
-    'SCHEMA':'app.schema.schema'
-}
+#GRAPHENE={
+    #'SCHEMA':'app.schema.schema'
+#}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
