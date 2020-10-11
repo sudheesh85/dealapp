@@ -2,9 +2,10 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest
+from app.models import User,Interest,Device
 from .userid_gen import uid,otp
 from datetime import datetime as dt
+
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -16,40 +17,65 @@ class InterestType(DjangoObjectType):
         model = Interest
         filter_fields=[]
         interfaces = (relay.Node, )
+class DeviceType(DjangoObjectType):
+    class Meta:
+        model=Device
+        filter_fields=[]
+        interfaces=(relay.Node,)
 
 class UserInput(graphene.InputObjectType):
-    name=graphene.String()
+    name=graphene.String(required=False)
     userCD=graphene.String()
-    mobile=graphene.String()
+    mobile=graphene.String(required=True)
     status=graphene.String()
+    interest=graphene.List(graphene.String)
     otp=graphene.String()
     otp_exp_time=graphene.DateTime()
     is_otp_verified=graphene.Boolean()
-    #price=graphene.Int()
+    
+class DeviceInput(graphene.InputObjectType):
+    device=graphene.JSONString()
+
+class addDevice(graphene.Mutation):
+    class Arguments:
+        #userCD=graphene.String()
+        input=UserInput(required=True) 
+        device=DeviceInput()
+    device=graphene.Field(DeviceType)
+    @staticmethod
+    def mutate(root,info,input=None,device=None):
+        print(device.device)
+        user=User.objects.get(mobile=input.mobile)
+        print(user.userCD)
+        device=Device.objects.create(userCD=user,device=device.device)
+        device.save()
+        return addDevice(device=device)
+
 class AddUser(graphene.Mutation):
     class Arguments:
         #id=graphene.ID(required=True)
-        input=UserInput(required=True)   
+        input=UserInput(required=True) 
+    ok=graphene.String()  
     user=graphene.Field(UserType)
 
     @staticmethod
     def mutate(root, info,input=None):
         print(input.mobile)
-        try:
-            user = User.objects.get(mobile=input.mobile)
-        #user=info.context.user
-            print("user:",user)
-            if user.mobile == input.mobile:
+        user,created = User.objects.get_or_create(mobile=input.mobile)
+        print("user:",created)
+        if created:
+            user.save()
+            ok="New user hs been created"
+            return AddUser(user=user,ok=ok)
+        if user.mobile == input.mobile:
+            if input.name:
                 user.name=input.name
-        except:
-            user = User(
-                #name=input.name, 
-                mobile=input.mobile, 
-                status=input.status,
-                #price=input.price,
-                )
+            if input.interest:
+                user.interest=input.interest
         user.save()
-        return AddUser(user=user)
+        ok="User has been updated"
+        return AddUser(user=user,ok=ok)
+
 class verifyOTP(graphene.Mutation):
     class Arguments:
         input=UserInput(required=True)
@@ -69,7 +95,7 @@ class verifyOTP(graphene.Mutation):
         except:
             ok=False
         user.save()
-        return verifyOTP(user=user)
+        return verifyOTP(user=user,ok=ok)
 
 class ResendOTP(graphene.Mutation):
     class Arguments:
@@ -106,6 +132,7 @@ class Mutation(ObjectType):
     Resend_otp=ResendOTP.Field()
     verify_otp=verifyOTP.Field()
     add_interest=AddInterest.Field()
+    add_device=addDevice.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, pk=graphene.Int())
@@ -114,6 +141,7 @@ class Query(ObjectType):
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
+    all_device=DjangoFilterConnectionField(DeviceType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
@@ -133,5 +161,7 @@ class Query(ObjectType):
             return Interest.objects.get(id=id)
     def resolve_all_interest(self,info,**kwargs):
         return Interest.objects.all()
+    def resolve_all_device(self,info,**kwargs):
+        return Device.objects.all()
 
 schema = Schema(query=Query,mutation=Mutation)
