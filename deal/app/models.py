@@ -67,11 +67,11 @@ class Vendor(models.Model):
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
     #userID=models.IntegerField()
-    userCD=models.CharField(max_length=6,blank=True,unique=True)
-    name = models.CharField(max_length=100)
-    nick_name = models.CharField(max_length=100)
+    userCD=models.CharField(max_length=6,null=True,unique=True,blank=True)
+    name = models.CharField(max_length=100,null=True)
+    nick_name = models.CharField(max_length=100,null=True)
     #city = models.CharField(max_length=50,default="Kochi")
-    email = models.CharField(max_length=100, blank=True)
+    email = models.CharField(max_length=100, null=True,blank=True)
     gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     dob=models.DateField(null=True)
     mobile = models.CharField(max_length=12,unique=True, blank=True)
@@ -79,25 +79,28 @@ class User(models.Model):
     otp_exp_time=models.DateTimeField(blank=True,default=now)
     is_otp_verified=models.BooleanField(null=True,default=False)
     #device_token=models.CharField(max_length=100,blank=True,default='')
-    choice=Interest.objects.all()#.values('category_name')
-    ch_list=[]
-    for ch in choice:
-        ch_list.append([ch.category_name,ch.category_name])
-    interest=MultiSelectField(choices=ch_list,min_choices=3,default='',blank=True)  
+    #choice=Interest.objects.all()#.values('category_name')
+    #ch_list=[]
+    #for ch in choice:
+        #ch_list.append([ch.category_name,ch.category_name])
+    #interest=MultiSelectField(choices=ch_list,min_choices=3,default='',blank=True)  
+    interest=ArrayField(models.CharField(max_length=100,blank=True),null=True,size=50,default=list)
     status = models.TextField(choices=USER_STATUS, default='', blank=True)
     no_of_coins = models.FloatField(blank=True,default=0.0)
     created_at = models.DateTimeField(blank=True,auto_now_add=True)
-    all_loc=ServiceLoc.objects.all()
-    loc_list=[]
-    for loc in all_loc:
-        loc_list.append([loc.location,loc.location])
-    serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
-    vendor=Vendor.objects.all()
-    vlist=[]
-    for vndr in vendor:
-        vlist.append([vndr.vendor_name,vndr.vendor_name])
-    interested_vendors=MultiSelectField(choices=vlist,default='',blank=True)
-    #vendor_is_followed=models.NullBooleanField(default=False)
+    serviceLoc = models.CharField(max_length=100,blank=True)
+    interested_vendors = ArrayField(models.CharField(max_length=100,blank=True),null=True,size=50,default=list)
+    #all_loc=ServiceLoc.objects.all()
+    #loc_list=[]
+    #for loc in all_loc:
+        #loc_list.append([loc.location,loc.location])
+    #serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
+    #vendor=Vendor.objects.all()
+    #vlist=[]
+    #for vndr in vendor:
+        #vlist.append([vndr.vendor_name,vndr.vendor_name])
+    #interested_vendors=MultiSelectField(choices=vlist,default='',blank=True)
+    vendor_is_followed=models.BooleanField(default=False)
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
            if self.pk is None:
@@ -125,6 +128,9 @@ class Global(models.Model):
 
     def __str__(self):
         return str(self.EXP_TIME)
+#class sample(models.Model):
+    #userCD=models.ForeignKey(User,on_delete=models.CASCADE)
+    #board=ArrayField(models.CharField(max_length=50,blank=True),default=list)
 
 
 #class User_Interest(models.Model):

@@ -8,7 +8,7 @@ from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from .models import Interest,User,ServiceLoc,Vendor,Device,Global
-from .forms import UserInterestForm,DeviceForm
+#from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
 from .fcm import FCM
@@ -46,7 +46,7 @@ class VendorAdmin(admin.ModelAdmin):
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
     list_display=('userCD','Device_dtl')
-    form = DeviceForm
+    #form = DeviceForm
 
     def Device_dtl(self,obj):
         return obj.device
@@ -71,7 +71,7 @@ class UserAdmin(admin.ModelAdmin):
     # list_select_related = ('type',)  # select_related in added only foreign key fields for query performance
     # raw_id_fields = ('product','type') # perfetch_related in added only manytomany fields for query performance
     list_filter = ('name','status','serviceLoc')  # list of fields filter in admin table
-    form=UserInterestForm
+    #form=UserInterestForm
     #list_editable = ('',)  # list of fields editable in admin table
     #filter_vertical = ('product',)  # filter vertical in added only manytomany fields for filter will displayed
     #actions = [update_gender_all]  # admin action function called

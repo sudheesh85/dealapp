@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
-from .models import Interest,User,Device
+#from .models import Interest,User,Device
 from entangled.forms import EntangledModelForm
 from multiselectfield import MultiSelectFormField,MultiSelectField
 from prettyjson import PrettyJSONWidget
 from django import forms
 from django.forms import fields, models
 
-class UserInterestForm(forms.ModelForm):
+'''class UserInterestForm(forms.ModelForm):
     class Meta:
         model = User
         fields='__all__'
@@ -15,7 +15,7 @@ class UserInterestForm(forms.ModelForm):
     for ch in choice:
         ch_list.append([ch.category_name,ch.category_name])
     #interest = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=ch_list)
-    interest = MultiSelectFormField(choices=ch_list)
+    interest = MultiSelectFormField(choices=ch_list)'''
 
 '''class MyModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -35,7 +35,7 @@ class UserInterestForm(forms.ModelForm):
         }'''
 
 
-class DeviceForm(EntangledModelForm):
+'''class DeviceForm(EntangledModelForm):
     token=forms.CharField()
     #token = fields.RegexField(
         #regex=r'^#[0-9a-f]{256}$',
@@ -56,4 +56,5 @@ class DeviceForm(EntangledModelForm):
     class Meta:
         model = Device
         entangled_fields = {'device': ['id', 'token', 'type']}  # fields provided by this form
-        untangled_fields = ['userCD']  # these fields are provided by the Product model
+        untangled_fields = ['userCD']  # these fields are provided by the Product model 
+    '''

@@ -99,7 +99,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'deal',
+        'NAME': 'yesdealdb',
 
         'USER': 'postgres',
 
