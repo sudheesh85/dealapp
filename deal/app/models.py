@@ -147,6 +147,22 @@ class Global(models.Model):
  #   def __str__(self):
   #      return str(self.interest)
   # 
+class Yesdeal(models.Model):
+    deal_title=models.CharField(max_length=500,null=True)
+    deal_desc= models.TextField(blank=True)
+    deal_org_price=models.DecimalField(max_digits=6, decimal_places=2)
+    deal_spl_price=models.DecimalField(max_digits=6, decimal_places=2)
+    ServiceLoc = models.CharField(max_length=100,blank=True)
+    deal_cateogry = models.CharField(max_length=100,blank=True)
+    deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
+    deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
+    deal_img3 = models.ImageField(upload_to='document',blank=True, null=True)
+    deal_img4 = models.ImageField(upload_to='document',blank=True, null=True)
+    deal_img5 = models.ImageField(upload_to='document',blank=True, null=True)
+    deal_start_time = models.DateTimeField(blank=True,auto_now_add=True)
+    deal_end_time = models.DateTimeField(blank=True,auto_now_add=True)
+    deal_count = models.IntegerField(default=0)
 
-
+    def __str__(self):
+        return self.deal_title
 
