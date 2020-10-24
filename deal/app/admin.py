@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,ServiceLoc,Vendor,Device,Global,Yesdeal
+from .models import Interest,User,ServiceLoc,Vendor,Device,Global,Yesdeal,Branch
 #from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -29,6 +29,9 @@ from .fcm import FCM
     #return ', '.join(instance.categories)
 @admin.register(Yesdeal)
 class YesdealAdmin(admin.ModelAdmin):
+    pass
+@admin.register(Branch)
+class BranchAdmin(admin.ModelAdmin):
     pass
 @admin.register(Global)
 class GlobalAdmin(admin.ModelAdmin):

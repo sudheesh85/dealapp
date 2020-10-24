@@ -147,12 +147,27 @@ class Global(models.Model):
  #   def __str__(self):
   #      return str(self.interest)
   # 
+class Branch(models.Model):
+    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE)
+    branch_id = models.IntegerField()
+    branch_name = models.CharField(max_length=500,blank=True)
+    branch_street = models.CharField(max_length=100,blank=True)
+    branch_city = models.CharField(max_length=100,blank=True)
+    brnach_pin = models.CharField(max_length=100,blank=True)
+    branch_contact = models.CharField(max_length=100,blank=True)
+    @property
+    def branch_id(self):
+       return self.id+1000
+    def __str__(self):
+        return self.branch_name
+
 class Yesdeal(models.Model):
+    deal_id = models.IntegerField()
     deal_title=models.CharField(max_length=500,null=True)
     deal_desc= models.TextField(blank=True)
     deal_org_price=models.DecimalField(max_digits=6, decimal_places=2)
     deal_spl_price=models.DecimalField(max_digits=6, decimal_places=2)
-    ServiceLoc = models.CharField(max_length=100,blank=True)
+    deal_srvc_loc = models.CharField(max_length=100,blank=True,null=True)
     deal_cateogry = models.CharField(max_length=100,blank=True)
     deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
     deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
@@ -162,7 +177,11 @@ class Yesdeal(models.Model):
     deal_start_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_end_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_count = models.IntegerField(default=0)
-
+    deal_vendor_name = models.CharField(max_length=200,blank=True)
+    deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
+    @property
+    def deal_id(self):
+       return self.id+10000
     def __str__(self):
         return self.deal_title
 
