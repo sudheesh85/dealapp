@@ -2,7 +2,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device
+from app.models import User,Interest,Device,Yesdeal,Branch
 from .userid_gen import uid,otp
 from datetime import datetime as dt
 
@@ -22,6 +22,11 @@ class DeviceType(DjangoObjectType):
         model=Device
         filter_fields=[]
         interfaces=(relay.Node,)
+class YesdealType(DjangoObjectType):
+    class Meta:
+        model = Yesdeal
+        filter_fields = []
+        interfaces = (relay.Node,)
 
 class UserInput(graphene.InputObjectType):
     name=graphene.String(required=False)

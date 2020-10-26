@@ -168,7 +168,7 @@ class Yesdeal(models.Model):
     deal_org_price=models.DecimalField(max_digits=6, decimal_places=2)
     deal_spl_price=models.DecimalField(max_digits=6, decimal_places=2)
     deal_srvc_loc = models.CharField(max_length=100,blank=True,null=True)
-    deal_cateogry = models.CharField(max_length=100,blank=True)
+    deal_cateogry = models.ForeignKey(Interest, on_delete=models.CASCADE)
     deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
     deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
     deal_img3 = models.ImageField(upload_to='document',blank=True, null=True)
