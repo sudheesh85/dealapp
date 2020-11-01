@@ -6,6 +6,11 @@ from app.models import User,Interest,Device,Yesdeal,Branch
 from .userid_gen import uid,otp
 from datetime import datetime as dt
 
+class YesdealType(DjangoObjectType):
+    class Meta:
+        model = Yesdeal
+        filter_fields=[]
+        interfaces = (relay.Node,)
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -22,11 +27,8 @@ class DeviceType(DjangoObjectType):
         model=Device
         filter_fields=[]
         interfaces=(relay.Node,)
-class YesdealType(DjangoObjectType):
-    class Meta:
-        model = Yesdeal
-        filter_fields = []
-        interfaces = (relay.Node,)
+class YesdealInput(graphene.InputObjectType):
+    pass
 
 class UserInput(graphene.InputObjectType):
     name=graphene.String(required=False)
@@ -76,7 +78,8 @@ class AddUser(graphene.Mutation):
             if input.name:
                 user.name=input.name
             if input.interest:
-                user.interest=input.interest
+                #user.interest=input.interest
+                user.interest.set(input.interest)
         user.save()
         ok="User has been updated"
         return AddUser(user=user,ok=ok)
@@ -121,13 +124,16 @@ class ResendOTP(graphene.Mutation):
         return ResendOTP(user=user)
 class InterestInput(graphene.InputObjectType):
     category_name=graphene.String()
+    category_id = graphene.Int()
 class AddInterest(graphene.Mutation):
     class Arguments:
         input=InterestInput(required=True)
     interest=graphene.Field(InterestType)
     @staticmethod
     def mutate(root,info,input=None):
+
         interest=Interest(
+            category_id=input.category_id,
             category_name=input.category_name
         )
         interest.save()
@@ -142,11 +148,13 @@ class Mutation(ObjectType):
 class Query(ObjectType):
     user = graphene.Field(UserType, pk=graphene.Int())
     interest=graphene.Field(InterestType,pk=graphene.Int())
+    deal = graphene.List(lambda:graphene.List(YesdealType),pk=graphene.String())
     jeep=graphene.String()
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)
+    all_deal = DjangoFilterConnectionField(YesdealType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
@@ -156,6 +164,28 @@ class Query(ObjectType):
         if id is not None:
             return User.objects.get(id=id)
         #return f"Mercedes Benz | Model:23qwer | Color: Black"'''
+    def resolve_deal(self,info,**kwargs):
+        userCD = kwargs.get("pk")
+        if userCD is not None:
+            user = User.objects.get(userCD=userCD)
+            #a=app_user_interest.objects.all()
+            #print(a)
+            #intr=a.category_name.all(user_id=user.id)
+            #print(user.id)
+            user_deal=[]
+            interest=user.interest.all().values('id')
+
+            print(interest)
+            for value in interest:
+                for key,id in value.items():
+                    #print(id)
+                    coll_deal = Yesdeal.objects.filter(deal_category_id=id)
+                    print(id,coll_deal)
+                    if coll_deal:
+                        user_deal.append(coll_deal)
+            return user_deal
+    def resolve_all_deal(self,info,**kwargs):
+        return Yesdeal.objects.all()
     def resolve_jeep(self,info):
         return f'ya hoo!!!'
     def resolve_all_user(self,info,**kwargs):
