@@ -47,7 +47,7 @@ class ServiceLoc(models.Model):
         return self.location
 
 class Vendor(models.Model):
-    vendor_id=models.IntegerField(default=1000,unique=True)
+    vendor_id=models.IntegerField()
     vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
@@ -150,8 +150,7 @@ class Yesdeal(models.Model):
     deal_title=models.CharField(max_length=500,null=True)
     deal_desc= models.TextField(blank=True)
     deal_org_price=models.DecimalField(max_digits=10, decimal_places=2)
-    deal_spl_price=models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
-    deal_offer_percentage = models.DecimalField(max_digits=5,decimal_places=2,default=0.0)
+    deal_spl_price=models.DecimalField(max_digits=10, decimal_places=2)
     deal_srvc_loc = models.CharField(max_length=100,blank=True,null=True)
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
     deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
@@ -162,17 +161,8 @@ class Yesdeal(models.Model):
     deal_start_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_end_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_count = models.IntegerField(default=0)
-    deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    deal_vendor_name = models.CharField(max_length=200,blank=True)
     deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
-    def save(self,*args,**kwargs):
-        if self.pk is None:
-            if self.deal_offer_percentage:
-                self.deal_spl_price = self.deal_org_price - (self.deal_org_price * (self.deal_offer_percentage/100))
-            else:
-                self.deal_offer_percentage = ((self.deal_org_price - self.deal_spl_price) / self.deal_org_price) * 100
-        super(Yesdeal, self).save(*args, **kwargs)
-
-
     @property
     def deal_id(self):
        return self.id+10000
