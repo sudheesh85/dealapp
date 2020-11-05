@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,ServiceLoc,Vendor,Device,Global,Yesdeal,Branch
+from .models import Interest,User,ServiceLoc,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal
 #from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -33,6 +33,15 @@ class YesdealAdmin(admin.ModelAdmin):
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(User_Vendor)
+class UserVendorAdmin(admin.ModelAdmin):
+    list_display=('userCD','vendor_id','user_is_followed','totalCollectedDeals')
+    #pass
+@admin.register(User_Deal)
+class UserDealAdmin(admin.ModelAdmin):
+    list_display=('userCD','deal_id','vendor_id','is_collected','is_deal_redeemed')
+
 @admin.register(Global)
 class GlobalAdmin(admin.ModelAdmin):
     list_display = ('OTP_EXP_TIME',)

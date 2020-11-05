@@ -1,4 +1,4 @@
-import datetime
+
 from django.db import models
 from django.db.models import JSONField
 from django.contrib.postgres.fields import ArrayField #,JSONField
@@ -53,7 +53,8 @@ class Vendor(models.Model):
     description=models.TextField(blank=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
-    
+    numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
+    totalCollectedDeals=models.CharField(max_length=5,blank=True)
     
     @property
     def vendor_id(self):
@@ -111,18 +112,8 @@ class User(models.Model):
        return self.id
     
     def __str__(self):
-        return self.name or ''
+        return self.name
 # Create your models here.
-
-class User_Vendor(models.Model):
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
-    user_is_followed=models.BooleanField(null=True,default=False)
-    numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
-    totalCollectedDeals=models.CharField(max_length=5,blank=True)
-
-    def __str__(self):
-        return str(self.userCD) or ''
 
 class Device(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -188,16 +179,5 @@ class Yesdeal(models.Model):
     def __str__(self):
         return self.deal_title
 
-class User_Deal(models.Model):
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    deal_id = models.ForeignKey(Yesdeal,on_delete=models.CASCADE,null=True)
-    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
-    is_collected = models.BooleanField(null=True,default=False)
-    collected_at = models.DateTimeField(blank=True,default=now)
-    QR_code = models.ImageField(upload_to='qrcode', blank=True, null=True)
-    is_deal_redeemed = models.BooleanField(null=True,default=False)
-
-    def __str__(self):
-        return str(self.userCD)
 
 
