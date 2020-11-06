@@ -81,7 +81,7 @@ class UserAdmin(admin.ModelAdmin):
     sortable_by = 'id'  # field 'id' sorted by descending order
     #date_hierarchy = 'created_at'  # field 'created_at' as date field display as descending order
     search_fields = ['name','nick_name']#,'city','mobile']  # list of fields search in admin table
-    list_display = ('name','serviceLoc','mobile','Interest','Following')#'city','email','gender','mobile') # list of fields display in admin table
+    list_display = ('name','serviceLoc','mobile','Interest')#,'Following')#'city','email','gender','mobile') # list of fields display in admin table
     list_display_links = ('name',)#city')  # list of fields display in table show as link
     # list_select_related = ('type',)  # select_related in added only foreign key fields for query performance
     # raw_id_fields = ('product','type') # perfetch_related in added only manytomany fields for query performance

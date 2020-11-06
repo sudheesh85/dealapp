@@ -51,10 +51,17 @@ class Vendor(models.Model):
     vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
+    vendor_img1 = models.ImageField(upload_to='document',blank=True, null=True)
+    vendor_img2 = models.ImageField(upload_to='document',blank=True, null=True)
+    vendor_img3 = models.ImageField(upload_to='document',blank=True, null=True)
+    vendor_img4 = models.ImageField(upload_to='document',blank=True, null=True)
+    vendor_img5 = models.ImageField(upload_to='document',blank=True, null=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
-    
-    
+    vendor_webpage = models.URLField(max_length=200, blank=True,null=True)
+    vendor_fb_link = models.URLField(max_length=200, blank=True,null=True)
+    vendor_twitter_link = models.URLField(max_length=200, blank=True,null=True)
+
     @property
     def vendor_id(self):
        return self.id+100
@@ -86,18 +93,18 @@ class User(models.Model):
     #interest=ArrayField(models.CharField(max_length=100,blank=True),null=True,size=50,default=list)
     interest = models.ManyToManyField(Interest, verbose_name="user_interest")
     status = models.TextField(choices=USER_STATUS, default='', blank=True)
-    no_of_coins = models.FloatField(blank=True,default=0.0)
+    #no_of_coins = models.FloatField(blank=True,default=0.0)
     created_at = models.DateTimeField(blank=True,auto_now_add=True)
     all_loc=ServiceLoc.objects.all()
     loc_list=[]
     for loc in all_loc:
         loc_list.append([loc.location,loc.location])
     serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
-    vendor=Vendor.objects.all()
-    vlist=[]
-    for vndr in vendor:
-        vlist.append([vndr.vendor_name,vndr.vendor_name])
-    interested_vendors=MultiSelectField(choices=vlist,default='',blank=True)
+    #vendor=Vendor.objects.all()
+    #vlist=[]
+    #for vndr in vendor:
+        #vlist.append([vndr.vendor_name,vndr.vendor_name])
+    #interested_vendors=MultiSelectField(choices=vlist,default='',blank=True)
     #vendor_is_followed=models.NullBooleanField(default=False)
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
@@ -171,6 +178,7 @@ class Yesdeal(models.Model):
     deal_start_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_end_time = models.DateTimeField(blank=True,auto_now_add=True)
     deal_count = models.IntegerField(default=0)
+    deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
     def save(self,*args,**kwargs):
@@ -194,7 +202,7 @@ class User_Deal(models.Model):
     vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     is_collected = models.BooleanField(null=True,default=False)
     collected_at = models.DateTimeField(blank=True,default=now)
-    QR_code = models.ImageField(upload_to='qrcode', blank=True, null=True)
+    QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
 
     def __str__(self):
