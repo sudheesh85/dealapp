@@ -39,24 +39,16 @@ class DeviceType(DjangoObjectType):
         filter_fields=[]
         interfaces=(relay.Node,)
 class YesdealInput(graphene.InputObjectType):
-    deal_sku_cd = graphene.String()
-    deal_title = graphene.String()
-    deal_desc = graphene.String()
-    deal_org_price = graphene.Float()
-    deal_spl_price = graphene.Float()
-    deal_category = graphene.Int()
-    deal_count = graphene.Int()
-    deal_vendor = graphene.Int()
-    deal_available_branch = graphene.Int()
+    pass
 class VendorInput(graphene.InputObjectType):
     pass
 class BranchInput(graphene.InputObjectType):
     pass
 
 class UserInput(graphene.InputObjectType):
-    name=graphene.String()
+    name=graphene.String(required=False)
     userCD=graphene.String()
-    mobile=graphene.String()
+    mobile=graphene.String(required=True)
     status=graphene.String()
     interest=graphene.List(graphene.String)
     otp=graphene.String()
@@ -97,28 +89,15 @@ class AddUser(graphene.Mutation):
             user.save()
             ok="New user hs been created"
             return AddUser(user=user,ok=ok)
-        else:
-            ok="User already exist please call UpdateUser"
-            return AddUser(ok=ok)
-class UpdateUser(graphene.Mutation):
-    class Arguments:
-        input = UserInput()
-    ok=graphene.String()
-    user = graphene.Field(UserType)
-    @staticmethod
-    def mutate(root,info,input=None):
-        user = User.objects.get(userCD = input.userCD)
-        if user.userCD == input.userCD  :
+        if user.mobile == input.mobile:
             if input.name:
                 user.name=input.name
-            if input.mobile:
-                user.mobile=input.mobile
             if input.interest:
                 #user.interest=input.interest
                 user.interest.set(input.interest)
         user.save()
         ok="User has been updated"
-        return UpdateUser(user=user,ok=ok)
+        return AddUser(user=user,ok=ok)
 
 class verifyOTP(graphene.Mutation):
     class Arguments:
@@ -174,39 +153,15 @@ class AddInterest(graphene.Mutation):
         )
         interest.save()
         return AddInterest(interest=interest)
-class AddDeal(graphene.Mutation):
-    class Arguments:
-        input = YesdealInput()
-    deal = graphene.Field(YesdealType)
-    @staticmethod
-    def mutate(root,info,input=None):
-        vendor_obj = Vendor.objects.get(id=input.deal_vendor)
-        category_obj = Interest.objects.get(id=input.deal_category)
-        branch_obj = Branch.objects.get(id=input.deal_available_branch)
-        #input.deal_vendor = vendor
-        deal=Yesdeal.objects.create(
-            deal_vendor=vendor_obj,
-            deal_title=input.deal_title,
-            deal_desc = input.deal_desc,
-            deal_count=input.deal_count,
-            deal_org_price = input.deal_org_price,
-            deal_spl_price = input.deal_spl_price,
-            deal_category=category_obj,
-            deal_available_branch = branch_obj)
-        #if deal:
-        deal.save()
-        return AddDeal(deal=deal)
 class Mutation(ObjectType):
     add_user = AddUser.Field()
     Resend_otp=ResendOTP.Field()
     verify_otp=verifyOTP.Field()
     add_interest=AddInterest.Field()
     add_device=addDevice.Field()
-    update_user=UpdateUser.Field()
-    add_deal = AddDeal.Field()
 
 class Query(ObjectType):
-    user = graphene.Field(UserType, userCD=graphene.String())
+    user = graphene.Field(UserType, pk=graphene.Int())
     interest=graphene.Field(InterestType,pk=graphene.Int())
     deal = graphene.List(lambda:graphene.List(YesdealType),pk=graphene.String())
     jeep=graphene.String()
@@ -220,9 +175,9 @@ class Query(ObjectType):
         #return Car.objects.all()
 
     def resolve_user(self, info,**kwargs):
-        userCD=kwargs.get("userCD")
-        if userCD is not None:
-            return User.objects.get(userCD=userCD)
+        id=kwargs.get("pk")
+        if id is not None:
+            return User.objects.get(id=id)
         #return f"Mercedes Benz | Model:23qwer | Color: Black"'''
     def resolve_deal(self,info,**kwargs):
         userCD = kwargs.get("pk")
