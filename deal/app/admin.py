@@ -40,7 +40,7 @@ class UserVendorAdmin(admin.ModelAdmin):
     #pass
 @admin.register(User_Deal)
 class UserDealAdmin(admin.ModelAdmin):
-    list_display=('userCD','deal_id','vendor_id','is_collected','is_deal_redeemed')
+    list_display=('user','deal','vendor','is_collected','is_deal_redeemed')
 
 @admin.register(Global)
 class GlobalAdmin(admin.ModelAdmin):

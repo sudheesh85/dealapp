@@ -6,6 +6,7 @@ from django.utils.timezone import now
 #from djongo import models
 from django.utils.crypto import get_random_string
 from .userid_gen import uid,otp
+from .passwd_gen import pwd
 from django import forms
 from multiselectfield import MultiSelectField
 from django.db.models.signals import post_save
@@ -21,6 +22,10 @@ USER_STATUS= (
     ('INACTIVE','INACTIVE'),
     ('SUSPENDED','SUSPENDED')
 )
+DEAL_STATUS=(
+    ('OPEN','OPEN'),
+    ('CLOSED','CLOSED')
+)
 DEVICE_TYPE=(
     ('{ANDROID}','{ANDROID}'),
     ('{iOS}','{iOS}')
@@ -30,6 +35,7 @@ class Interest(models.Model):
     
     category_id=models.IntegerField(default=100,unique=True)
     category_name=models.CharField(max_length=50,null=True,unique=True)
+    category_img = models.ImageField(upload_to='document',blank=True, null=True)
     #@property
     #def category_id(self):
        #return self.id+100
@@ -74,6 +80,7 @@ class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
     #userID=models.IntegerField()
     userCD=models.CharField(max_length=6,null=True,unique=True,blank=True)
+    password = models.CharField(max_length=8,null=True,blank=True)
     name = models.CharField(max_length=100,null=True)
     nick_name = models.CharField(max_length=100,null=True)
     #city = models.CharField(max_length=50,default="Kochi")
@@ -110,6 +117,7 @@ class User(models.Model):
            ## This to check if it creates a new or updates an old instance
            if self.pk is None:
               self.userCD = uid.make_id()
+              self.password = pwd.get_password()
               self.otp=otp.get_otp()
               self.otp_exp_time=otp.get_exp_time()
            super(User, self).save(*args, **kwargs)
@@ -181,6 +189,7 @@ class Yesdeal(models.Model):
     deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
+    deal_status = models.TextField(choices=DEAL_STATUS, default='', blank=True)
     def save(self,*args,**kwargs):
         if self.pk is None:
             if self.deal_offer_percentage:
@@ -197,15 +206,15 @@ class Yesdeal(models.Model):
         return self.deal_title
 
 class User_Deal(models.Model):
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    deal_id = models.ForeignKey(Yesdeal,on_delete=models.CASCADE,null=True)
-    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    deal = models.ForeignKey(Yesdeal,on_delete=models.CASCADE,null=True)
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     is_collected = models.BooleanField(null=True,default=False)
     collected_at = models.DateTimeField(blank=True,default=now)
     QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
 
     def __str__(self):
-        return str(self.userCD)
+        return str(self.user)
 
 
