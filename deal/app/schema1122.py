@@ -1,12 +1,10 @@
 import graphene
-import graphql_jwt
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
 from app.models import User,Interest,Device,Yesdeal,Branch,Vendor
 from .userid_gen import uid,otp
 from datetime import datetime as dt
-from django.utils import timezone
 
 
 class YesdealType(DjangoObjectType):
@@ -102,26 +100,6 @@ class AddUser(graphene.Mutation):
         else:
             ok="User already exist please call UpdateUser"
             return AddUser(ok=ok)
-class SendOTP(graphene.Mutation):
-    class Arguments:
-        mobile = graphene.String()
-    ok = graphene.String()
-    user = graphene.Field(UserType)
-    @staticmethod
-    def mutate(root,info,mobile):
-        user,created = User.objects.get_or_create(mobile=mobile)
-        if created:
-
-            ok="OTP for new user has been created"
-        else:
-            user.otp=otp.get_otp()
-            user.is_otp_verified=False
-            user.otp_exp_time=otp.get_exp_time()
-            ok="OTP for existing user has been created"
-        user.save()
-        return SendOTP(user=user,ok=ok)
-
-
 class UpdateUser(graphene.Mutation):
     class Arguments:
         input = UserInput()
@@ -144,53 +122,42 @@ class UpdateUser(graphene.Mutation):
 
 class verifyOTP(graphene.Mutation):
     class Arguments:
-        input=UserInput(required=True) 
-    ok = graphene.String()
-    user = graphene.Field(UserType)
+        input=UserInput(required=True)
+    ok = graphene.Boolean()
+    user=graphene.Field(UserType)
     @staticmethod
     def mutate(root,info,input=None):
-        user=User.objects.get(mobile=input.mobile)
-        ctime=timezone.now()
-        print(ctime)
-        condition=[user.otp==input.otp,not user.is_otp_verified,ctime < user.otp_exp_time]
-        if not user.userCD:
-            user.userCD = uid.make_id()
-            user.created_at = ctime
+        try:
+            user=User.objects.get(userCD=input.userCD)
+            ctime=dt.now()
+            condition=[user.otp==input.otp,not user.is_otp_verified,ctime < otp_exp_time]
             if all(condition):
                 user.is_otp_verified=True
-                user.otp="xxxxxx"
-                ok="OTP has been verified and user has been created"
+                ok=True
             else:
-                ok="OTP verification failed"
-        else:
-            if all(condition):
-                user.is_otp_verified=True
-                user.otp="xxxxxx"
-                ok="OTP has been verified"
-            else:
-                user.is_otp_verified=False
-                ok="OTP verification failed"
+                ok=False
+        except:
+            ok=False
         user.save()
         return verifyOTP(user=user,ok=ok)
 
 class ResendOTP(graphene.Mutation):
     class Arguments:
-        mobile = graphene.String()
-    ok = graphene.String()
-    user = graphene.Field(UserType)
+        input=UserInput(required=True)   
+    user=graphene.Field(UserType)
     @staticmethod
-    def mutate(root,info,mobile):
+    def mutate(root, info,input=None):
         try:
-            user = User.objects.get(mobile=mobile)
-            user.otp=otp.get_otp()
-            user.is_otp_verified=False
-            user.otp_exp_time=otp.get_exp_time()
-            ok="OTP for existing user has been resent"
-            user.save()
-            return ResendOTP(user=user,ok=ok)
+            user = User.objects.get(mobile=input.mobile)
+        #user=info.context.user
+            print("user:",user)
+            if user.mobile == input.mobile:
+                user.otp=otp.get_otp()
+                user.otp_exp_time=otp.get_exp_time()
         except:
-            ok="User does not exist"
-            return ResendOTP(ok=ok)
+            pass
+        user.save()
+        return ResendOTP(user=user)
 class InterestInput(graphene.InputObjectType):
     category_name=graphene.String()
     category_id = graphene.Int()
@@ -230,17 +197,13 @@ class AddDeal(graphene.Mutation):
         deal.save()
         return AddDeal(deal=deal)
 class Mutation(ObjectType):
-    #add_user = AddUser.Field()
+    add_user = AddUser.Field()
     Resend_otp=ResendOTP.Field()
     verify_otp=verifyOTP.Field()
     add_interest=AddInterest.Field()
     add_device=addDevice.Field()
     update_user=UpdateUser.Field()
     add_deal = AddDeal.Field()
-    #token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    #verify_token = graphql_jwt.Verify.Field()
-    #refresh_token = graphql_jwt.Refresh.Field()
-    sendOTP = SendOTP.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
@@ -258,8 +221,6 @@ class Query(ObjectType):
 
     def resolve_user(self, info,**kwargs):
         userCD=kwargs.get("userCD")
-        user = info.context.user
-        print(user)
         if userCD is not None:
             return User.objects.get(userCD=userCD)
         #return f"Mercedes Benz | Model:23qwer | Color: Black"'''

@@ -116,8 +116,8 @@ class User(models.Model):
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
            if self.pk is None:
-              self.userCD = uid.make_id()
-              self.password = pwd.get_password()
+              #self.userCD = uid.make_id()
+              #self.password = pwd.get_password()
               self.otp=otp.get_otp()
               self.otp_exp_time=otp.get_exp_time()
            super(User, self).save(*args, **kwargs)

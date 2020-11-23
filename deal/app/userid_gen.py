@@ -14,7 +14,7 @@ class GenerateOTP:
     def get_exp_time(self):
         now=dt.now()
         validity=30
-        exp_time=now+timedelta(0,30)
+        exp_time=now+timedelta(minutes=10)
         return exp_time
 
 otp=GenerateOTP()
