@@ -5,8 +5,10 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
 from app.models import User,Interest,Device,Yesdeal,Branch,Vendor
 from .userid_gen import uid,otp
+from .passwd_gen import tok
 from datetime import datetime as dt
 from django.utils import timezone
+from graphql import GraphQLError
 
 
 class YesdealType(DjangoObjectType):
@@ -58,6 +60,7 @@ class BranchInput(graphene.InputObjectType):
 class UserInput(graphene.InputObjectType):
     name=graphene.String()
     userCD=graphene.String()
+    user_token = graphene.String()
     mobile=graphene.String()
     status=graphene.String()
     interest=graphene.List(graphene.String)
@@ -114,6 +117,7 @@ class SendOTP(graphene.Mutation):
 
             ok="OTP for new user has been created"
         else:
+            user.user_token = tok.get_token()
             user.otp=otp.get_otp()
             user.is_otp_verified=False
             user.otp_exp_time=otp.get_exp_time()
@@ -130,17 +134,21 @@ class UpdateUser(graphene.Mutation):
     @staticmethod
     def mutate(root,info,input=None):
         user = User.objects.get(userCD = input.userCD)
-        if user.userCD == input.userCD  :
-            if input.name:
-                user.name=input.name
-            if input.mobile:
-                user.mobile=input.mobile
-            if input.interest:
-                #user.interest=input.interest
-                user.interest.set(input.interest)
-        user.save()
-        ok="User has been updated"
-        return UpdateUser(user=user,ok=ok)
+        if user.user_token == input.user_token :
+            if user.userCD == input.userCD  :
+                if input.name:
+                    user.name=input.name
+                #if input.mobile:
+                    #user.mobile=input.mobile
+                if input.interest:
+                    #user.interest=input.interest
+                    user.interest.set(input.interest)
+            user.save()
+            ok="User has been updated"
+            return UpdateUser(user=user,ok=ok)
+        else:
+            raise GraphQLError('User must be authenticated')
+
 
 class verifyOTP(graphene.Mutation):
     class Arguments:
@@ -182,6 +190,7 @@ class ResendOTP(graphene.Mutation):
     def mutate(root,info,mobile):
         try:
             user = User.objects.get(mobile=mobile)
+            user.user_token = tok.get_token()
             user.otp=otp.get_otp()
             user.is_otp_verified=False
             user.otp_exp_time=otp.get_exp_time()

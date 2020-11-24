@@ -6,7 +6,7 @@ from django.utils.timezone import now
 #from djongo import models
 from django.utils.crypto import get_random_string
 from .userid_gen import uid,otp
-from .passwd_gen import pwd
+from .passwd_gen import tok
 from django import forms
 from multiselectfield import MultiSelectField
 from django.db.models.signals import post_save
@@ -81,6 +81,7 @@ class User(models.Model):
     #userID=models.IntegerField()
     userCD=models.CharField(max_length=6,null=True,unique=True,blank=True)
     password = models.CharField(max_length=8,null=True,blank=True)
+    user_token = models.CharField(max_length=8,null=True,blank=True)
     name = models.CharField(max_length=100,null=True)
     nick_name = models.CharField(max_length=100,null=True)
     #city = models.CharField(max_length=50,default="Kochi")
@@ -118,6 +119,7 @@ class User(models.Model):
            if self.pk is None:
               #self.userCD = uid.make_id()
               #self.password = pwd.get_password()
+              self.user_token = tok.get_token()
               self.otp=otp.get_otp()
               self.otp_exp_time=otp.get_exp_time()
            super(User, self).save(*args, **kwargs)
