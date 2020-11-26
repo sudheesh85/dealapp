@@ -42,7 +42,17 @@ class Interest(models.Model):
     
     def __str__(self):
         return self.category_name
-class ServiceLoc(models.Model):
+class Region(models.Model):
+    city = models.CharField(max_length=50,null=True)
+    def __str__(self):
+        return self.city
+class Area(models.Model):
+    name = models.CharField(max_length=200,null=True)
+    city = models.ForeignKey(to=Region, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
+
+'''class ServiceLoc(models.Model):
     loc_id=models.IntegerField()
     location=models.CharField(max_length=50,null=True)
     @property
@@ -50,7 +60,7 @@ class ServiceLoc(models.Model):
         return self.id+100
     
     def __str__(self):
-        return self.location
+        return self.location'''
 
 class Vendor(models.Model):
     vendor_id=models.IntegerField(default=1000,unique=True)
@@ -80,7 +90,7 @@ class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
     #userID=models.IntegerField()
     userCD=models.CharField(max_length=6,null=True,unique=True,blank=True)
-    password = models.CharField(max_length=8,null=True,blank=True)
+    #password = models.CharField(max_length=8,null=True,blank=True)
     user_token = models.CharField(max_length=8,null=True,blank=True)
     name = models.CharField(max_length=100,null=True)
     nick_name = models.CharField(max_length=100,null=True)
@@ -103,11 +113,12 @@ class User(models.Model):
     status = models.TextField(choices=USER_STATUS, default='', blank=True)
     #no_of_coins = models.FloatField(blank=True,default=0.0)
     created_at = models.DateTimeField(blank=True,auto_now_add=True)
-    all_loc=ServiceLoc.objects.all()
-    loc_list=[]
-    for loc in all_loc:
-        loc_list.append([loc.location,loc.location])
-    serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
+    service_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
+    #all_loc=ServiceLoc.objects.all()
+    #loc_list=[]
+    #for loc in all_loc:
+        #loc_list.append([loc.location,loc.location])
+    #serviceLoc=models.TextField(choices=loc_list,default='',blank=True)
     #vendor=Vendor.objects.all()
     #vlist=[]
     #for vndr in vendor:
@@ -178,7 +189,8 @@ class Yesdeal(models.Model):
     deal_org_price=models.DecimalField(max_digits=10, decimal_places=2)
     deal_spl_price=models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     deal_offer_percentage = models.DecimalField(max_digits=5,decimal_places=2,default=0.0)
-    deal_srvc_loc = models.CharField(max_length=100,blank=True,null=True)
+    deal_srvc_city = models.ForeignKey(Region,on_delete=models.CASCADE,null=True)
+    deal_srvc_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
     deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
     deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)

@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,ServiceLoc,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal
+from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area
 #from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -27,6 +27,12 @@ from .fcm import FCM
 
 #def categories(instance):
     #return ', '.join(instance.categories)
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    pass
+@admin.register(Area)
+class AreaAdmin(admin.ModelAdmin):
+    pass
 @admin.register(Yesdeal)
 class YesdealAdmin(admin.ModelAdmin):
     pass
@@ -75,17 +81,17 @@ class DeviceAdmin(admin.ModelAdmin):
         return obj.device'''
 
 class UserAdmin(admin.ModelAdmin):
-    exclude = ('created_at','userCD')   # exclude list of fields those not display in admin form
+    exclude = ('created_at','userCD','user_token')   # exclude list of fields those not display in admin form
     # fields = ('name', 'address', 'gender','age')  # list of fields display in admin form
     # readonly_fields = ('age',)  # list of fields as readonly [NonEditable fields]
     sortable_by = 'id'  # field 'id' sorted by descending order
     #date_hierarchy = 'created_at'  # field 'created_at' as date field display as descending order
     search_fields = ['name','nick_name']#,'city','mobile']  # list of fields search in admin table
-    list_display = ('name','serviceLoc','mobile','Interest')#,'Following')#'city','email','gender','mobile') # list of fields display in admin table
+    list_display = ('name','mobile','Interest')#,'Following')#'city','email','gender','mobile') # list of fields display in admin table
     list_display_links = ('name',)#city')  # list of fields display in table show as link
     # list_select_related = ('type',)  # select_related in added only foreign key fields for query performance
     # raw_id_fields = ('product','type') # perfetch_related in added only manytomany fields for query performance
-    list_filter = ('name','status','serviceLoc')  # list of fields filter in admin table
+    list_filter = ('name','status')#'serviceLoc')  # list of fields filter in admin table
     #form=UserInterestForm
     #list_editable = ('',)  # list of fields editable in admin table
     #filter_vertical = ('product',)  # filter vertical in added only manytomany fields for filter will displayed
@@ -127,7 +133,7 @@ admin.site.unregister(Group)
 # register app
 admin.site.register(User, UserAdmin)
 admin.site.register(Interest,InterestAdmin)
-admin.site.register(ServiceLoc,ServiceLocAdmin)
+#admin.site.register(ServiceLoc,ServiceLocAdmin)
 admin.site.register(Vendor,VendorAdmin)
 #admin.site.register(Device,DeviceAdmin)
 
