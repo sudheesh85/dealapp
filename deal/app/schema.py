@@ -3,7 +3,7 @@ import graphql_jwt
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -37,6 +37,17 @@ class InterestType(DjangoObjectType):
         model = Interest
         filter_fields=[]
         interfaces = (relay.Node, )
+class RegionType(DjangoObjectType):
+    class Meta:
+        model = Region
+        filter_fields=[]
+        interfaces = (relay.Node,)
+class AreaType(DjangoObjectType):
+    class Meta:
+        model = Area
+        filter_fields=[]
+        interfaces = (relay.Node,)
+
 class DeviceType(DjangoObjectType):
     class Meta:
         model=Device
@@ -55,6 +66,10 @@ class YesdealInput(graphene.InputObjectType):
 class VendorInput(graphene.InputObjectType):
     pass
 class BranchInput(graphene.InputObjectType):
+    pass
+class RegionInput(graphene.InputObjectType):
+    pass
+class AreaInput(graphene.InputObjectType):
     pass
 
 class UserInput(graphene.InputObjectType):
@@ -225,6 +240,8 @@ class AddDeal(graphene.Mutation):
         vendor_obj = Vendor.objects.get(id=input.deal_vendor)
         category_obj = Interest.objects.get(id=input.deal_category)
         branch_obj = Branch.objects.get(id=input.deal_available_branch)
+        city_obj = Region.objects.get(id=input.deal_srvc_city)
+        area_obj = Area.objects.get(id=input.deal_srvc_area)
         #input.deal_vendor = vendor
         deal=Yesdeal.objects.create(
             deal_vendor=vendor_obj,
@@ -234,7 +251,9 @@ class AddDeal(graphene.Mutation):
             deal_org_price = input.deal_org_price,
             deal_spl_price = input.deal_spl_price,
             deal_category=category_obj,
-            deal_available_branch = branch_obj)
+            deal_available_branch = branch_obj,
+            deal_srvc_city = city_obj,
+            deal_srvc_area = area_obj)
         #if deal:
         deal.save()
         return AddDeal(deal=deal)
