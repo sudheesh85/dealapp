@@ -30,6 +30,13 @@ DEVICE_TYPE=(
     ('{ANDROID}','{ANDROID}'),
     ('{iOS}','{iOS}')
 )
+AGE_LIMIT = (
+    ('18-30','18-30'),
+    ('31-40','31-40'),
+    ('41-50','41-50'),
+    ('51-60','51-60'),
+    ('61-Above','61-Above')
+)
 
 class Interest(models.Model):
     
@@ -200,6 +207,8 @@ class Yesdeal(models.Model):
     deal_start_time = models.DateTimeField(blank=True,default=now)
     deal_end_time = models.DateTimeField(blank=True,default=now)
     deal_avail_max = models.IntegerField(default=0)
+    deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
+    deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)

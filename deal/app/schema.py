@@ -273,7 +273,7 @@ class Mutation(ObjectType):
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
     interest=graphene.Field(InterestType,pk=graphene.Int())
-    deal = graphene.List(lambda:graphene.List(YesdealType),pk=graphene.String())
+    deal = graphene.List(lambda:graphene.List(YesdealType),userCD=graphene.String(),token =graphene.String(required=True))
     jeep=graphene.String()
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
@@ -292,25 +292,31 @@ class Query(ObjectType):
             return User.objects.get(userCD=userCD)
         #return f"Mercedes Benz | Model:23qwer | Color: Black"'''
     def resolve_deal(self,info,**kwargs):
-        userCD = kwargs.get("pk")
+        userCD = kwargs.get("userCD")
+        user_token=kwargs.get("token")
         if userCD is not None:
             user = User.objects.get(userCD=userCD)
             #a=app_user_interest.objects.all()
             #print(a)
             #intr=a.category_name.all(user_id=user.id)
             #print(user.id)
-            user_deal=[]
-            interest=user.interest.all().values('id')
+            if user.user_token == user_token:
+                user_deal=[]
+                interest=user.interest.all().values('id')
 
-            print(interest)
-            for value in interest:
-                for key,id in value.items():
+                print(interest)
+                for value in interest:
+                    for key,id in value.items():
                     #print(id)
-                    coll_deal = Yesdeal.objects.filter(deal_category_id=id)
-                    print(id,coll_deal)
-                    if coll_deal:
-                        user_deal.append(coll_deal)
-            return user_deal
+                        coll_deal = Yesdeal.objects.filter(deal_category_id=id)
+                        print(id,coll_deal)
+                        if coll_deal:
+                            user_deal.append(coll_deal)
+                return user_deal
+            else:
+                raise GraphQLError('User must be authenticated')
+        else:
+            raise GraphQLError("UserCD must be passed as input argument")
     def resolve_all_deal(self,info,**kwargs):
         return Yesdeal.objects.all()
     def resolve_jeep(self,info):
