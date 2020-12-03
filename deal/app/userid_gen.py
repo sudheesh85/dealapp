@@ -3,7 +3,7 @@ from datetime import datetime as dt,timedelta
 import pyotp
 class RandomTokenGenerator:
     def make_id(self):
-        return get_random_string(6)
+        return get_random_string(16)
 
 uid = RandomTokenGenerator()
 
