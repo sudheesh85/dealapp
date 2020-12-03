@@ -98,7 +98,7 @@ class User(models.Model):
     #userID=models.IntegerField()
     userCD=models.CharField(max_length=6,null=True,unique=True,blank=True)
     #password = models.CharField(max_length=8,null=True,blank=True)
-    user_token = models.CharField(max_length=8,null=True,blank=True)
+    user_token = models.CharField(max_length=16,null=True,blank=True)
     name = models.CharField(max_length=100,null=True)
     nick_name = models.CharField(max_length=100,null=True)
     #city = models.CharField(max_length=50,default="Kochi")

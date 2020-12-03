@@ -1,5 +1,5 @@
 import graphene
-import graphql_jwt
+#import graphql_jwt
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
@@ -10,7 +10,14 @@ from datetime import datetime as dt
 from django.utils import timezone
 from graphql import GraphQLError
 
-
+class Gender(graphene.Enum):
+    Male = "Male"
+    Female = "Female"
+class Status(graphene.Enum):
+    A = "Active"
+    I = "Inactive"
+    T = "Terminated"
+    S = "Suspended"
 class YesdealType(DjangoObjectType):
     class Meta:
         model = Yesdeal
@@ -82,6 +89,8 @@ class UserInput(graphene.InputObjectType):
     otp=graphene.String()
     otp_exp_time=graphene.DateTime()
     is_otp_verified=graphene.Boolean()
+    gender = Gender()
+    status = Status()
     
 class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
@@ -149,10 +158,15 @@ class UpdateUser(graphene.Mutation):
     @staticmethod
     def mutate(root,info,input=None):
         user = User.objects.get(userCD = input.userCD)
-        if user.user_token == input.user_token :
+        condition = [user.is_otp_verified,user.user_token == input.user_token]
+        if all(condition) :
             if user.userCD == input.userCD  :
                 if input.name:
                     user.name=input.name
+                if input.gender:
+                    user.gender = input.gender
+                if input.status:
+                    user.status = input.status
                 #if input.mobile:
                     #user.mobile=input.mobile
                 if input.interest:
