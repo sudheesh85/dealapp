@@ -141,7 +141,7 @@ class SendOTP(graphene.Mutation):
 
             ok="OTP for new user has been created"
         else:
-            user.user_token = tok.get_token()
+            #user.user_token = tok.get_token()
             user.otp=otp.get_otp()
             user.is_otp_verified=False
             user.otp_exp_time=otp.get_exp_time()
@@ -192,6 +192,7 @@ class verifyOTP(graphene.Mutation):
         condition=[user.otp==input.otp,not user.is_otp_verified,ctime < user.otp_exp_time]
         if not user.userCD:
             user.userCD = uid.make_id()
+            user.user_token = tok.get_token()
             user.created_at = ctime
             if all(condition):
                 user.is_otp_verified=True
@@ -201,6 +202,7 @@ class verifyOTP(graphene.Mutation):
                 ok="OTP verification failed"
         else:
             if all(condition):
+                user.user_token = tok.get_token()
                 user.is_otp_verified=True
                 user.otp="xxxxxx"
                 ok="OTP has been verified"
@@ -219,7 +221,7 @@ class ResendOTP(graphene.Mutation):
     def mutate(root,info,mobile):
         try:
             user = User.objects.get(mobile=mobile)
-            user.user_token = tok.get_token()
+            #user.user_token = tok.get_token()
             user.otp=otp.get_otp()
             user.is_otp_verified=False
             user.otp_exp_time=otp.get_exp_time()

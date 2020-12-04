@@ -137,7 +137,7 @@ class User(models.Model):
            if self.pk is None:
               #self.userCD = uid.make_id()
               #self.password = pwd.get_password()
-              self.user_token = tok.get_token()
+              #self.user_token = tok.get_token()
               self.otp=otp.get_otp()
               self.otp_exp_time=otp.get_exp_time()
            super(User, self).save(*args, **kwargs)
