@@ -74,6 +74,9 @@ class Vendor(models.Model):
     vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
+    vendor_street = models.CharField(max_length=100,blank=True)
+    vendor_city = models.CharField(max_length=100,blank=True)
+    location_pin = models.CharField(max_length=100,blank=True)
     vendor_img1 = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_img2 = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_img3 = models.ImageField(upload_to='document',blank=True, null=True)
@@ -207,6 +210,7 @@ class Yesdeal(models.Model):
     deal_start_time = models.DateTimeField(blank=True,default=now)
     deal_end_time = models.DateTimeField(blank=True,default=now)
     deal_avail_max = models.IntegerField(default=0)
+    deal_collected_till = models.IntegerField(default=0)
     deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
     deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
@@ -236,6 +240,7 @@ class User_Deal(models.Model):
     collected_at = models.DateTimeField(blank=True,default=now)
     QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
+    user_wah_points = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.user)
