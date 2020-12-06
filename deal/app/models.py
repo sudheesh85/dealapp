@@ -38,6 +38,7 @@ AGE_LIMIT = (
     ('61-Above','61-Above')
 )
 
+
 class Interest(models.Model):
     
     category_id=models.IntegerField(default=100,unique=True)
@@ -241,6 +242,7 @@ class User_Deal(models.Model):
     QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
     user_wah_points = models.IntegerField(default=0)
+    deal_scratch_status = models.BooleanField(null=True,default=False)
 
     def __str__(self):
         return str(self.user)
