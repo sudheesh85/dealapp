@@ -37,7 +37,10 @@ AGE_LIMIT = (
     ('51-60','51-60'),
     ('61-Above','61-Above')
 )
-
+METHOD = (
+    ('Request','Request'),
+    ('Send','Send')
+)
 
 class Interest(models.Model):
     
@@ -153,15 +156,29 @@ class User(models.Model):
         return self.name or ''
 # Create your models here.
 
+class Shared_coin_history(models.Model):
+    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
+    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    numberOfRedeemableCoins = models.IntegerField(default=0)
+    from_user = models.CharField(max_length=12,unique=True, blank=True)
+    num_of_shared_coins = models.IntegerField(default=0)
+    shared_at = models.DateTimeField(blank=True,default=now)
+    shared_method = models.TextField(choices=METHOD, default='', blank=True)
+
+    def __str__(self):
+        return str(self.numberOfRedeemableCoins)
+
 class User_Vendor(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)
     vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     user_is_followed=models.BooleanField(null=True,default=False)
-    numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
+    #numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
+    user_coins = models.ForeignKey(Shared_coin_history,on_delete = models.CASCADE,default=0)
     totalCollectedDeals=models.CharField(max_length=5,blank=True)
 
     def __str__(self):
         return str(self.userCD) or ''
+
 
 class Device(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -175,9 +192,9 @@ class Global(models.Model):
 
     def __str__(self):
         return str(self.EXP_TIME)
-class sample(models.Model):
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    board=ArrayField(models.CharField(max_length=50,blank=True),default=list)
+#class sample(models.Model):
+    #userCD=models.ForeignKey(User,on_delete=models.CASCADE)
+    #board=ArrayField(models.CharField(max_length=50,blank=True),default=list)
 
 class Branch(models.Model):
     vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE)
