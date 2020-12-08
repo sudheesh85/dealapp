@@ -141,7 +141,7 @@ class SendOTP(graphene.Mutation):
 
             ok="OTP for new user has been created"
         else:
-            #user.user_token = tok.get_token()
+            user.user_token = user.user_token.replace(user.user_token[:6],'xxxxxx')
             user.otp=otp.get_otp()
             user.is_otp_verified=False
             user.otp_exp_time=otp.get_exp_time()
