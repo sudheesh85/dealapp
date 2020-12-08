@@ -166,7 +166,7 @@ class Shared_coin_history(models.Model):
     shared_method = models.TextField(choices=METHOD, default='', blank=True)
 
     def __str__(self):
-        return str(self.numberOfRedeemableCoins)
+        return str(self.numberOfRedeemableCoins-self.num_of_shared_coins)
 
 class User_Vendor(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)

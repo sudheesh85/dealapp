@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area
+from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history
 #from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -62,6 +62,9 @@ class ServiceLocAdmin(admin.ModelAdmin):
     exclude=('loc_id',)
     #pass
 class VendorAdmin(admin.ModelAdmin):
+    pass
+@admin.register(Shared_coin_history)
+class Shared_coin_historyAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Device)
