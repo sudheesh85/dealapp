@@ -65,7 +65,8 @@ class VendorAdmin(admin.ModelAdmin):
     pass
 @admin.register(Shared_coin_history)
 class Shared_coin_historyAdmin(admin.ModelAdmin):
-    pass
+    list_display=('user','vendor','numberOfRedeemableCoins','num_of_shared_coins','shared_method')
+    #pass
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
