@@ -42,7 +42,7 @@ class BranchAdmin(admin.ModelAdmin):
 
 @admin.register(User_Vendor)
 class UserVendorAdmin(admin.ModelAdmin):
-    list_display=('userCD','vendor_id','user_is_followed','totalCollectedDeals')
+    list_display=('user','vendor','numberOfRedeemableCoins','user_is_followed','totalCollectedDeals')
     #pass
 @admin.register(User_Deal)
 class UserDealAdmin(admin.ModelAdmin):
@@ -65,7 +65,8 @@ class VendorAdmin(admin.ModelAdmin):
     pass
 @admin.register(Shared_coin_history)
 class Shared_coin_historyAdmin(admin.ModelAdmin):
-    list_display=('user','vendor','numberOfRedeemableCoins','num_of_shared_coins','shared_method')
+    exclude = ('numberOfRedeemableCoins',)
+    list_display=('user','vendor','num_of_comp_coins','num_of_shared_coins','shared_method')
     #pass
 
 @admin.register(Device)

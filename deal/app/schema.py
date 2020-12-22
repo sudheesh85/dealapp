@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -18,6 +18,11 @@ class Status(graphene.Enum):
     I = "Inactive"
     T = "Terminated"
     S = "Suspended"
+class Shared_method(graphene.Enum):
+    R = "Received"
+    S = "Send"
+    C = "Complement"
+
 class YesdealType(DjangoObjectType):
     class Meta:
         model = Yesdeal
@@ -54,7 +59,16 @@ class AreaType(DjangoObjectType):
         model = Area
         filter_fields=[]
         interfaces = (relay.Node,)
-
+class SharedType(DjangoObjectType):
+    class Meta:
+        model = Shared_coin_history
+        filter_fields=[]
+        interfaces = (relay.Node,)
+class UserVendorType(DjangoObjectType):
+    class Meta:
+        model = User_Vendor
+        filter_fields=[]
+        interfaces = (relay.Node,)
 class DeviceType(DjangoObjectType):
     class Meta:
         model=Device
@@ -71,7 +85,30 @@ class YesdealInput(graphene.InputObjectType):
     deal_vendor = graphene.Int()
     deal_available_branch = graphene.Int()
 class VendorInput(graphene.InputObjectType):
-    pass
+    vendor_name=graphene.String()
+    phone_number = graphene.String()
+    description = graphene.String()
+    vendor_street = graphene.String()
+    vendor_city = graphene.String()
+    location_pin = graphene.String()
+    totalDeals = graphene.Int()
+    totalActiveDeals = graphene.Int()
+    vendor_webpage = graphene.String()
+    vendor_fb_link = graphene.String()
+    vendor_twitter_link = graphene.String()
+class SharedInput(graphene.InputObjectType):
+    user = graphene.String()
+    vendor = graphene.String()
+    numberOfRedeemableCoins = graphene.Int()
+    num_of_comp_coins = graphene.Int()
+    num_of_shared_coins = graphene.Int()
+    shared_method = Shared_method()
+class UserVendorInput(graphene.InputObjectType):
+    user = graphene.String()
+    vendor = graphene.String()
+    user_is_followed = graphene.Boolean()
+    numberOfRedeemableCoins = graphene.Int()
+    totalCollectedDeals = graphene.String()
 class BranchInput(graphene.InputObjectType):
     pass
 class RegionInput(graphene.InputObjectType):
@@ -109,7 +146,86 @@ class addDevice(graphene.Mutation):
         device=Device.objects.create(userCD=user,device=device.device)
         device.save()
         return addDevice(device=device)
-
+class addVendor(graphene.Mutation):
+    class Arguments:
+        input=VendorInput()
+    vendor = graphene.Field(VendorType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor = Vendor(
+            vendor_name = input.vendor_name,
+            phone_number = input.phone_number,
+            description = input.description,
+            vendor_street = input.vendor_street,
+            vendor_city = input.vendor_city,
+            location_pin = input.location_pin,
+            totalDeals = input.totalDeals,
+            totalActiveDeals = input.totalActiveDeals,
+            vendor_webpage = input.vendor_webpage,
+            vendor_fb_link = input.vendor_fb_link,
+            vendor_twitter_link = input.vendor_twitter_link
+        )
+        vendor.save()
+        return addVendor(vendor=vendor)
+class updateCoin(graphene.Mutation):
+    class Arguments:
+        input = SharedInput()
+    ok = graphene.String()
+    user_coin = graphene.Field(SharedType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        user_coin = Shared_coin_history.objects.filter(user = input.user,vendor = input.vendor).latest('shared_at')
+        vendor_obj = Vendor.objects.get(id =input.vendor)
+        user_obj = User.objects.get(id  = input.user)
+        if user_coin:
+            print("coins:",user_coin,type(user_coin.numberOfRedeemableCoins))
+            init_coin = user_coin.numberOfRedeemableCoins
+        else:
+            init_coin = 0
+        if input.shared_method == 'Send' and init_coin > input.num_of_shared_coins:
+            init_coin = init_coin - input.num_of_shared_coins
+        else:
+            ok = "User does not have enough coin to send"
+        if input.shared_method =='Received':
+            init_coin = init_coin + input.num_of_shared_coins
+        if input.shared_method == 'Complement':
+            init_coin = init_coin + input.num_of_comp_coins
+        shared_coin = Shared_coin_history.objects.create(
+            user = user_obj,
+            vendor = vendor_obj,
+            numberOfRedeemableCoins = init_coin,
+            num_of_shared_coins = input.num_of_shared_coins,
+            num_of_comp_coins = input.num_of_comp_coins,
+            shared_method = input.shared_method)
+        shared_coin.save()
+        return updateCoin(user_coin = shared_coin)    
+class updateUserVendor(graphene.Mutation):
+    class Arguments:
+        input = UserVendorInput()
+    ok = graphene.String()
+    user_vendor = graphene.Field(UserVendorType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        user_vendor = User_Vendor.objects.filter(user = input.user,vendor = input.vendor)
+        shared_obj = Shared_coin_history.objects.filter(user = input.user,vendor = input.vendor).latest('shared_at')
+        vendor_obj = Vendor.objects.get(id =input.vendor)
+        user_obj = User.objects.get(id  = input.user)
+        if user_vendor:
+            if input.user_is_followed:
+                user_vendor.user_is_followed = input.user_is_followed
+            if input.totalCollectedDeals:
+                user_vendor.totalCollectedDeals = input.totalCollectedDeals
+            user_vendor.numberOfRedeemableCoins = shared_obj
+        else:
+            user_vendor = User_Vendor.objects.create(
+                user = user_obj,
+                vendor = vendor_obj,
+                user_is_followed = input.user_is_followed,
+                numberOfRedeemableCoins = shared_obj,
+                totalCollectedDeals = input.totalCollectedDeals
+            )
+        user_vendor.save()
+        return updateUserVendor(user_vendor=user_vendor)
 class AddUser(graphene.Mutation):
     class Arguments:
         #id=graphene.ID(required=True)
@@ -279,23 +395,28 @@ class Mutation(ObjectType):
     verify_otp=verifyOTP.Field()
     add_interest=AddInterest.Field()
     add_device=addDevice.Field()
+    add_vendor = addVendor.Field()
     update_user=UpdateUser.Field()
     add_deal = AddDeal.Field()
     #token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     #verify_token = graphql_jwt.Verify.Field()
     #refresh_token = graphql_jwt.Refresh.Field()
     sendOTP = SendOTP.Field()
+    shared_coin = updateCoin.Field()
+    user_vendor = updateUserVendor.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
     interest=graphene.Field(InterestType,pk=graphene.Int())
     deal = graphene.List(lambda:graphene.List(YesdealType),userCD=graphene.String(),token =graphene.String(required=True))
     jeep=graphene.String()
+    userVendor = graphene.List(UserVendorType,user=graphene.String(required=True),vendor=graphene.String())
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)
     all_deal = DjangoFilterConnectionField(YesdealType)
+    all_vendor = DjangoFilterConnectionField(VendorType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
@@ -307,6 +428,10 @@ class Query(ObjectType):
         if userCD is not None:
             return User.objects.get(userCD=userCD)
         #return f"Mercedes Benz | Model:23qwer | Color: Black"'''
+    def resolve_userVendor(self,info,**kwargs):
+        user = kwargs.get("user")
+        vendor = kwargs.get("vendor") 
+        return User_Vendor.objects.filter(user=user,vendor=vendor)
     def resolve_deal(self,info,**kwargs):
         userCD = kwargs.get("userCD")
         user_token=kwargs.get("token")
@@ -347,5 +472,7 @@ class Query(ObjectType):
         return Interest.objects.all()
     def resolve_all_device(self,info,**kwargs):
         return Device.objects.all()
+    def resolve_all_vendor(self,info,**kwargs):
+        return Vendor.objects.all()
 
 schema = Schema(query=Query,mutation=Mutation)

@@ -160,30 +160,25 @@ class User(models.Model):
 class Shared_coin_history(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
-    numberOfRedeemableCoins = models.IntegerField()
-    from_user = models.CharField(max_length=12,blank=True)
+    numberOfRedeemableCoins = models.IntegerField(default=0)
+    #from_user = models.CharField(max_length=12,blank=True)
+    num_of_comp_coins = models.IntegerField(default=0)
     num_of_shared_coins = models.IntegerField(default=0)
     shared_at = models.DateTimeField(blank=True,default=now)
     shared_method = models.TextField(choices=METHOD, default='', blank=True)
-
     def __str__(self):
-        if self.shared_method == 'Send':
-            return str(self.numberOfRedeemableCoins-self.num_of_shared_coins)
-        if self.shared_method == 'Recieved':
-            return str(self.numberOfRedeemableCoins + self.num_of_shared_coins)
-        else:
-            return str(self.numberOfRedeemableCoins)
+        return str(self.numberOfRedeemableCoins)
 
 class User_Vendor(models.Model):
-    userCD=models.ForeignKey(User,on_delete=models.CASCADE)
-    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     user_is_followed=models.BooleanField(null=True,default=False)
     #numberOfRedeemableCoins=models.CharField(max_length=5,blank=True)
     numberOfRedeemableCoins = models.ForeignKey(Shared_coin_history,on_delete = models.CASCADE,default=0)
     totalCollectedDeals=models.CharField(max_length=5,blank=True)
 
     def __str__(self):
-        return str(self.userCD) or ''
+        return str(self.user) or ''
 
 
 class Device(models.Model):
