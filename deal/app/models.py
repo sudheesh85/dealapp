@@ -75,7 +75,8 @@ class Area(models.Model):
         return self.location'''
 
 class Vendor(models.Model):
-    vendor_id=models.IntegerField(default=1000,unique=True)
+    #vendor_id=models.IntegerField(default=1000,unique=True)
+    vendor_cd=models.CharField(max_length=6,null=True,unique=True,blank=True)
     vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
@@ -92,10 +93,14 @@ class Vendor(models.Model):
     vendor_webpage = models.URLField(max_length=200, blank=True,null=True)
     vendor_fb_link = models.URLField(max_length=200, blank=True,null=True)
     vendor_twitter_link = models.URLField(max_length=200, blank=True,null=True)
-
-    @property
-    def vendor_id(self):
-       return self.id+100
+    def save(self, *args, **kwargs):
+           ## This to check if it creates a new or updates an old instance
+           if self.pk is None:
+              self.vendor_cd = uid.make_id()
+           super(Vendor, self).save(*args, **kwargs)
+    #@property
+    #def vendor_id(self):
+       #return self.id+100
 
     def __str__(self):
         return self.vendor_name

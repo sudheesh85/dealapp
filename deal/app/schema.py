@@ -174,9 +174,11 @@ class updateCoin(graphene.Mutation):
     user_coin = graphene.Field(SharedType)
     @staticmethod
     def mutate(root,info,input=None):
-        user_coin = Shared_coin_history.objects.filter(user = input.user,vendor = input.vendor).latest('shared_at')
-        vendor_obj = Vendor.objects.get(id =input.vendor)
-        user_obj = User.objects.get(id  = input.user)
+        user_obj = User.objects.get(userCD  = input.user)
+        vendor_obj = Vendor.objects.get(vendor_cd =input.vendor)
+        user_coin = Shared_coin_history.objects.filter(user = user_obj.id,vendor = vendor_obj.id).latest('shared_at')
+        #vendor_obj = Vendor.objects.get(id =input.vendor)
+        #user_obj = User.objects.get(userCD  = input.user)
         if user_coin:
             print("coins:",user_coin,type(user_coin.numberOfRedeemableCoins))
             init_coin = user_coin.numberOfRedeemableCoins
