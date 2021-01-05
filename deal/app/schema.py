@@ -208,26 +208,30 @@ class updateUserVendor(graphene.Mutation):
     user_vendor = graphene.Field(UserVendorType)
     @staticmethod
     def mutate(root,info,input=None):
-        user_vendor = User_Vendor.objects.filter(user = input.user,vendor = input.vendor)
-        shared_obj = Shared_coin_history.objects.filter(user = input.user,vendor = input.vendor).latest('shared_at')
-        vendor_obj = Vendor.objects.get(id =input.vendor)
-        user_obj = User.objects.get(id  = input.user)
+        user_obj = User.objects.get(userCD  = input.user)
+        vendor_obj = Vendor.objects.get(vendor_cd =input.vendor)
+        user_vendor = User_Vendor.objects.filter(user = user_obj.id,vendor = vendor_obj.id)
+        shared_obj = Shared_coin_history.objects.filter(user = user_obj.id,vendor = vendor_obj.id).latest('shared_at')
+        #vendor_obj = Vendor.objects.get(id =input.vendor)
+        #user_obj = User.objects.get(id  = input.user)
         if user_vendor:
             if input.user_is_followed:
                 user_vendor.user_is_followed = input.user_is_followed
             if input.totalCollectedDeals:
                 user_vendor.totalCollectedDeals = input.totalCollectedDeals
-            user_vendor.numberOfRedeemableCoins = shared_obj
+            user_vendor.numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins
+            user_vendor[0].save()
+            return updateUserVendor(user_vendor=user_vendor[0])
         else:
             user_vendor = User_Vendor.objects.create(
                 user = user_obj,
                 vendor = vendor_obj,
                 user_is_followed = input.user_is_followed,
-                numberOfRedeemableCoins = shared_obj,
+                numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins,
                 totalCollectedDeals = input.totalCollectedDeals
             )
-        user_vendor.save()
-        return updateUserVendor(user_vendor=user_vendor)
+            user_vendor.save()
+            return updateUserVendor(user_vendor=user_vendor)
 class AddUser(graphene.Mutation):
     class Arguments:
         #id=graphene.ID(required=True)
