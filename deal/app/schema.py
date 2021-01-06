@@ -215,11 +215,13 @@ class updateUserVendor(graphene.Mutation):
         #vendor_obj = Vendor.objects.get(id =input.vendor)
         #user_obj = User.objects.get(id  = input.user)
         if user_vendor:
-            if input.user_is_followed:
-                user_vendor.user_is_followed = input.user_is_followed
+            print("inside",shared_obj.numberOfRedeemableCoins)
+            #if input.user_is_followed:
+            user_vendor[0].user_is_followed = input.user_is_followed
+            print(user_vendor[0].user_is_followed)
             if input.totalCollectedDeals:
-                user_vendor.totalCollectedDeals = input.totalCollectedDeals
-            user_vendor.numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins
+                user_vendor[0].totalCollectedDeals = input.totalCollectedDeals
+            #user_vendor[0].numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins
             user_vendor[0].save()
             return updateUserVendor(user_vendor=user_vendor[0])
         else:
@@ -227,7 +229,7 @@ class updateUserVendor(graphene.Mutation):
                 user = user_obj,
                 vendor = vendor_obj,
                 user_is_followed = input.user_is_followed,
-                numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins,
+                #numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins,
                 totalCollectedDeals = input.totalCollectedDeals
             )
             user_vendor.save()
@@ -437,7 +439,9 @@ class Query(ObjectType):
     def resolve_userVendor(self,info,**kwargs):
         user = kwargs.get("user")
         vendor = kwargs.get("vendor") 
-        return User_Vendor.objects.filter(user=user,vendor=vendor)
+        user_obj = User.objects.get(userCD  = user)
+        vendor_obj = Vendor.objects.get(vendor_cd = vendor)
+        return User_Vendor.objects.filter(user=user_obj.id,vendor=vendor_obj.id)
     def resolve_deal(self,info,**kwargs):
         userCD = kwargs.get("userCD")
         user_token=kwargs.get("token")
