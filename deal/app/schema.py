@@ -229,7 +229,7 @@ class updateUserVendor(graphene.Mutation):
                 user = user_obj,
                 vendor = vendor_obj,
                 user_is_followed = input.user_is_followed,
-                numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins,
+                numberOfRedeemableCoins = shared_obj,
                 totalCollectedDeals = input.totalCollectedDeals
             )
             user_vendor.save()
