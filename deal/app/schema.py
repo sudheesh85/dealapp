@@ -221,7 +221,7 @@ class updateUserVendor(graphene.Mutation):
             print(user_vendor[0].user_is_followed)
             if input.totalCollectedDeals:
                 user_vendor[0].totalCollectedDeals = input.totalCollectedDeals
-            #user_vendor[0].numberOfRedeemableCoins = shared_obj.numberOfRedeemableCoins
+            user_vendor[0].numberOfRedeemableCoins = shared_obj
             user_vendor[0].save()
             return updateUserVendor(user_vendor=user_vendor[0])
         else:
