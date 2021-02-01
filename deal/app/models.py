@@ -203,16 +203,16 @@ class Global(models.Model):
     #board=ArrayField(models.CharField(max_length=50,blank=True),default=list)
 
 class Branch(models.Model):
-    vendor_id = models.ForeignKey(Vendor,on_delete=models.CASCADE)
-    branch_id = models.IntegerField()
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE)
+    #branch_id = models.IntegerField()
     branch_name = models.CharField(max_length=500,blank=True)
     branch_street = models.CharField(max_length=100,blank=True)
     branch_city = models.CharField(max_length=100,blank=True)
-    brnach_pin = models.CharField(max_length=100,blank=True)
+    branch_pin = models.CharField(max_length=100,blank=True)
     branch_contact = models.CharField(max_length=100,blank=True)
-    @property
-    def branch_id(self):
-       return self.id+1000
+    #@property
+    #def branch_id(self):
+       #return self.id+1000
     def __str__(self):
         return self.branch_name
 

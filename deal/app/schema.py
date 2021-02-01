@@ -110,7 +110,12 @@ class UserVendorInput(graphene.InputObjectType):
     numberOfRedeemableCoins = graphene.Int()
     totalCollectedDeals = graphene.String()
 class BranchInput(graphene.InputObjectType):
-    pass
+    vendor = graphene.String()
+    branch_name = graphene.String()
+    branch_street = graphene.String()
+    branch_city = graphene.String()
+    branch_pin = graphene.String()
+    branch_contact = graphene.String()
 class RegionInput(graphene.InputObjectType):
     pass
 class AreaInput(graphene.InputObjectType):
@@ -167,6 +172,23 @@ class addVendor(graphene.Mutation):
         )
         vendor.save()
         return addVendor(vendor=vendor)
+class addBranch(graphene.Mutation):
+    class Arguments:
+        input=BranchInput()
+    branch = graphene.Field(BranchType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor_obj = Vendor.objects.get(vendor_cd = input.vendor)
+        branch = Branch.objects.create(
+            vendor=vendor_obj,
+            branch_name = input.branch_name,
+            branch_street = input.branch_street,
+            branch_city = input.branch_city,
+            branch_pin = input.branch_pin,
+            branch_contact = input.branch_contact
+        )
+        branch.save()
+        return addBranch(branch=branch)
 class updateCoin(graphene.Mutation):
     class Arguments:
         input = SharedInput()
@@ -412,6 +434,7 @@ class Mutation(ObjectType):
     sendOTP = SendOTP.Field()
     shared_coin = updateCoin.Field()
     user_vendor = updateUserVendor.Field()
+    add_branch = addBranch.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
