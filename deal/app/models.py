@@ -42,6 +42,11 @@ METHOD = (
     ('Send','Send'),
     ('Compliment','Compliment')
 )
+VENDOR_STATUS = (
+    ('Active','Active'),
+    ('Approval Pending','Approval Pending'),
+    ('Deactivated','Deactivated')
+)
 
 class Interest(models.Model):
     
@@ -97,6 +102,7 @@ class Vendor(models.Model):
     vendor_webpage = models.URLField(max_length=200, blank=True,null=True)
     vendor_fb_link = models.URLField(max_length=200, blank=True,null=True)
     vendor_twitter_link = models.URLField(max_length=200, blank=True,null=True)
+    vendor_status = models.TextField(choices=VENDOR_STATUS, default='', blank=True)
     
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
@@ -109,7 +115,14 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+class Vendor_login(models.Model):
+    user_name = models.CharField(max_length=20,null=True,unique=True,blank=True)
+    password = models.CharField(max_length=20,null=True,blank=True)
+    vendor_token = models.CharField(max_length=16,null=True,blank=True)
+    
 
+    def __str__(self):
+        return self.userName
 
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)

@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Vendor_login
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -32,6 +32,11 @@ class VendorType(DjangoObjectType):
     class Meta:
         model = Vendor
         filter_fields=[]
+        interfaces = (relay.Node,)
+class VendorloginType(DjangoObjectType):
+    class Meta:
+        model = Vendor_login
+        filter_fields = []
         interfaces = (relay.Node,)
 class BranchType(DjangoObjectType):
     class Meta:
@@ -96,6 +101,10 @@ class VendorInput(graphene.InputObjectType):
     vendor_webpage = graphene.String()
     vendor_fb_link = graphene.String()
     vendor_twitter_link = graphene.String()
+class VendorloginInput(graphene.InputObjectType):
+    user_name = graphene.String()
+    password = graphene.String()
+    vendor_token = graphene.String()
 class SharedInput(graphene.InputObjectType):
     user = graphene.String()
     vendor = graphene.String()
@@ -172,6 +181,23 @@ class addVendor(graphene.Mutation):
         )
         vendor.save()
         return addVendor(vendor=vendor)
+class vendorLogin(graphene.Mutation):
+    class Arguments:
+        input=VendorloginInput()
+    login = graphene.Field(VendorloginType)
+    ok = graphene.String() 
+    @staticmethod
+    def mutate(root,info,input=None):
+        login,created = Vendor_login.objects.get_or_create(user_name=input.user_name)
+        if created:
+            login.password = input.password
+            login.vendor_token = tok.get_token()
+            ok = "login successfully"
+        else:
+            ok = "vendor already exist"
+        login.save()
+        return vendorLogin(login=login,ok=ok)
+
 class addBranch(graphene.Mutation):
     class Arguments:
         input=BranchInput()
@@ -435,6 +461,7 @@ class Mutation(ObjectType):
     shared_coin = updateCoin.Field()
     user_vendor = updateUserVendor.Field()
     add_branch = addBranch.Field()
+    vendor_login = vendorLogin.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
