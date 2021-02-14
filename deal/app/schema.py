@@ -479,7 +479,7 @@ class Mutation(ObjectType):
     user_vendor = updateUserVendor.Field()
     add_branch = addBranch.Field()
     vendor_login = vendorLogin.Field()
-    forgot_passwd = updatePassword.Field()
+    forgot_password = updatePassword.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
