@@ -98,7 +98,7 @@ class Vendor(models.Model):
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
     vendor_email = models.CharField(max_length=100,blank=True)
-    vendor_whatsapp = models.CharField(max_length=10,unique=True, blank=True)
+    vendor_whatsapp = models.CharField(max_length=10,null=True, blank=True)
     vendor_webpage = models.URLField(max_length=200, blank=True,null=True)
     vendor_fb_link = models.URLField(max_length=200, blank=True,null=True)
     vendor_twitter_link = models.URLField(max_length=200, blank=True,null=True)

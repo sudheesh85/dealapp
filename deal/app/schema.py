@@ -192,11 +192,28 @@ class vendorLogin(graphene.Mutation):
         if created:
             login.password = input.password
             login.vendor_token = tok.get_token()
-            ok = "login successfully"
+            ok = "login created successfully"
         else:
-            ok = "vendor already exist"
+            if login.password == input.password:
+                ok = "login successfully"
+            else:
+                ok = "passowrd incorrect"
         login.save()
         return vendorLogin(login=login,ok=ok)
+class updatePassword(graphene.Mutation):
+    class Arguments:
+        input=VendorloginInput()
+    upd_pwd = graphene.Field(VendorloginType)
+    ok = graphene.String()
+    @staticmethod
+    def mutate(root,info,input=None):
+        upd_pwd = Vendor_login.objects.get(user_name = input.user_name)
+        if upd_pwd:
+            upd_pwd.password = input.password
+            upd_pwd.vendor_token = tok.get_token()
+        ok = "password has been changed successfully"
+        upd_pwd.save()
+        return updatePassword(upd_pwd=upd_pwd,ok=ok)
 
 class addBranch(graphene.Mutation):
     class Arguments:
@@ -462,6 +479,7 @@ class Mutation(ObjectType):
     user_vendor = updateUserVendor.Field()
     add_branch = addBranch.Field()
     vendor_login = vendorLogin.Field()
+    forgot_passwd = updatePassword.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
