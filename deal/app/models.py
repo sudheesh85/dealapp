@@ -47,6 +47,7 @@ class Interest(models.Model):
     
     category_id=models.IntegerField(default=100,unique=True)
     category_name=models.CharField(max_length=50,null=True,unique=True)
+    image_title = models.CharField(max_length=50,null=True)
     category_img = models.ImageField(upload_to='document',blank=True, null=True)
     #@property
     #def category_id(self):
@@ -77,12 +78,13 @@ class Area(models.Model):
 class Vendor(models.Model):
     #vendor_id=models.IntegerField(default=1000,unique=True)
     vendor_cd=models.CharField(max_length=6,null=True,unique=True,blank=True)
+    vendor_logo = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_name=models.CharField(max_length=200,blank=True)
     phone_number=models.CharField(max_length=10,unique=True, blank=True)
     description=models.TextField(blank=True)
     vendor_street = models.CharField(max_length=100,blank=True)
     vendor_city = models.CharField(max_length=100,blank=True)
-    location_pin = models.CharField(max_length=100,blank=True)
+    vendor_pin_code = models.CharField(max_length=100,blank=True)
     vendor_img1 = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_img2 = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_img3 = models.ImageField(upload_to='document',blank=True, null=True)
@@ -90,9 +92,12 @@ class Vendor(models.Model):
     vendor_img5 = models.ImageField(upload_to='document',blank=True, null=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
+    vendor_email = models.CharField(max_length=100,blank=True)
+    vendor_whatsapp = models.CharField(max_length=10,unique=True, blank=True)
     vendor_webpage = models.URLField(max_length=200, blank=True,null=True)
     vendor_fb_link = models.URLField(max_length=200, blank=True,null=True)
     vendor_twitter_link = models.URLField(max_length=200, blank=True,null=True)
+    
     def save(self, *args, **kwargs):
            ## This to check if it creates a new or updates an old instance
            if self.pk is None:
