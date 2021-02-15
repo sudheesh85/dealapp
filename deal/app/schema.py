@@ -167,6 +167,7 @@ class addVendor(graphene.Mutation):
     class Arguments:
         input=VendorInput()
     vendor = graphene.Field(VendorType)
+    ok = graphene.String()
     @staticmethod
     def mutate(root,info,input=None):
         vendor = Vendor(
@@ -185,8 +186,9 @@ class addVendor(graphene.Mutation):
             vendor_twitter_link = input.vendor_twitter_link,
             vendor_status = "Approval Pending"
         )
+        ok = "Vendor registered successfully"
         vendor.save()
-        return addVendor(vendor=vendor)
+        return addVendor(vendor=vendor,ok=ok)
 class vendorLogin(graphene.Mutation):
     class Arguments:
         input=VendorInput()
