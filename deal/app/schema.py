@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Vendor_login
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -22,6 +22,10 @@ class Shared_method(graphene.Enum):
     R = "Received"
     S = "Send"
     C = "Complement"
+class Venor_Status(graphene.Enum):
+    A="Active"
+    P = "Approval Pending"
+    D = "Deactivated"
 
 class YesdealType(DjangoObjectType):
     class Meta:
@@ -33,11 +37,7 @@ class VendorType(DjangoObjectType):
         model = Vendor
         filter_fields=[]
         interfaces = (relay.Node,)
-class VendorloginType(DjangoObjectType):
-    class Meta:
-        model = Vendor_login
-        filter_fields = []
-        interfaces = (relay.Node,)
+
 class BranchType(DjangoObjectType):
     class Meta:
         model = Branch
@@ -90,6 +90,9 @@ class YesdealInput(graphene.InputObjectType):
     deal_vendor = graphene.Int()
     deal_available_branch = graphene.Int()
 class VendorInput(graphene.InputObjectType):
+    user_name = graphene.String()
+    password = graphene.String()
+    vendor_token = graphene.String()
     vendor_name=graphene.String()
     phone_number = graphene.String()
     description = graphene.String()
@@ -101,10 +104,10 @@ class VendorInput(graphene.InputObjectType):
     vendor_webpage = graphene.String()
     vendor_fb_link = graphene.String()
     vendor_twitter_link = graphene.String()
-class VendorloginInput(graphene.InputObjectType):
-    user_name = graphene.String()
-    password = graphene.String()
-    vendor_token = graphene.String()
+#class VendorloginInput(graphene.InputObjectType):
+    #user_name = graphene.String()
+    #password = graphene.String()
+    #vendor_token = graphene.String()
 class SharedInput(graphene.InputObjectType):
     user = graphene.String()
     vendor = graphene.String()
@@ -167,6 +170,8 @@ class addVendor(graphene.Mutation):
     @staticmethod
     def mutate(root,info,input=None):
         vendor = Vendor(
+            user_name = input.user_name,
+            password = input.password,
             vendor_name = input.vendor_name,
             phone_number = input.phone_number,
             description = input.description,
@@ -177,41 +182,44 @@ class addVendor(graphene.Mutation):
             totalActiveDeals = input.totalActiveDeals,
             vendor_webpage = input.vendor_webpage,
             vendor_fb_link = input.vendor_fb_link,
-            vendor_twitter_link = input.vendor_twitter_link
+            vendor_twitter_link = input.vendor_twitter_link,
+            vendor_status = "Approval Pending"
         )
         vendor.save()
         return addVendor(vendor=vendor)
 class vendorLogin(graphene.Mutation):
     class Arguments:
-        input=VendorloginInput()
-    login = graphene.Field(VendorloginType)
+        input=VendorInput()
+    login = graphene.Field(VendorType)
     ok = graphene.String() 
     @staticmethod
     def mutate(root,info,input=None):
-        login,created = Vendor_login.objects.get_or_create(user_name=input.user_name)
-        if created:
-            login.password = input.password
-            login.vendor_token = tok.get_token()
-            ok = "login created successfully"
-        else:
+        login = Vendor.objects.get(user_name=input.user_name)
+        if login and login.vendor_status == 'Active':
             if login.password == input.password:
+                login.vendor_token = tok.get_token()
                 ok = "login successfully"
             else:
-                ok = "passowrd incorrect"
+                ok = "password is incorrect"
+
+        else:
+            ok = "Either vendor does not exist or active in the system "
         login.save()
         return vendorLogin(login=login,ok=ok)
 class updatePassword(graphene.Mutation):
     class Arguments:
-        input=VendorloginInput()
-    upd_pwd = graphene.Field(VendorloginType)
+        input=VendorInput()
+    upd_pwd = graphene.Field(VendorType)
     ok = graphene.String()
     @staticmethod
     def mutate(root,info,input=None):
-        upd_pwd = Vendor_login.objects.get(user_name = input.user_name)
-        if upd_pwd:
+        upd_pwd = Vendor.objects.get(user_name = input.user_name)
+        if upd_pwd and upd_pwd.vendor_status == 'Active':
             upd_pwd.password = input.password
             upd_pwd.vendor_token = tok.get_token()
-        ok = "password has been changed successfully"
+            ok = "password has been changed successfully"
+        else:
+            ok="Vendor is not active in the system"
         upd_pwd.save()
         return updatePassword(upd_pwd=upd_pwd,ok=ok)
 

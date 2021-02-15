@@ -82,6 +82,9 @@ class Area(models.Model):
 
 class Vendor(models.Model):
     #vendor_id=models.IntegerField(default=1000,unique=True)
+    user_name = models.CharField(max_length=20,null=True,unique=True,blank=True)
+    password = models.CharField(max_length=20,null=True,blank=True)
+    vendor_token = models.CharField(max_length=16,null=True,blank=True)
     vendor_cd=models.CharField(max_length=6,null=True,unique=True,blank=True)
     vendor_logo = models.ImageField(upload_to='document',blank=True, null=True)
     vendor_name=models.CharField(max_length=200,blank=True)
@@ -115,14 +118,14 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
-class Vendor_login(models.Model):
-    user_name = models.CharField(max_length=20,null=True,unique=True,blank=True)
-    password = models.CharField(max_length=20,null=True,blank=True)
-    vendor_token = models.CharField(max_length=16,null=True,blank=True)
+#class Vendor_login(models.Model):
+    #user_name = models.CharField(max_length=20,null=True,unique=True,blank=True)
+    #password = models.CharField(max_length=20,null=True,blank=True)
+    #vendor_token = models.CharField(max_length=16,null=True,blank=True)
     
 
-    def __str__(self):
-        return self.userName
+    #def __str__(self):
+        #return self.userName
 
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
