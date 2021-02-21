@@ -22,7 +22,7 @@ class Shared_method(graphene.Enum):
     R = "Received"
     S = "Send"
     C = "Complement"
-class Venor_Status(graphene.Enum):
+class Vendor_Status(graphene.Enum):
     A="Active"
     P = "Approval Pending"
     D = "Deactivated"
@@ -98,12 +98,15 @@ class VendorInput(graphene.InputObjectType):
     description = graphene.String()
     vendor_street = graphene.String()
     vendor_city = graphene.String()
-    location_pin = graphene.String()
+    vendor_pin_code = graphene.String()
     totalDeals = graphene.Int()
     totalActiveDeals = graphene.Int()
+    vendor_email = graphene.String()
+    vendor_whatsapp = graphene.String()
     vendor_webpage = graphene.String()
     vendor_fb_link = graphene.String()
     vendor_twitter_link = graphene.String()
+    vendor_status=Vendor_Status()
 #class VendorloginInput(graphene.InputObjectType):
     #user_name = graphene.String()
     #password = graphene.String()
@@ -163,7 +166,7 @@ class addDevice(graphene.Mutation):
         device=Device.objects.create(userCD=user,device=device.device)
         device.save()
         return addDevice(device=device)
-class addVendor(graphene.Mutation):
+class registerVendor(graphene.Mutation):
     class Arguments:
         input=VendorInput()
     vendor = graphene.Field(VendorType)
@@ -175,20 +178,62 @@ class addVendor(graphene.Mutation):
             password = input.password,
             vendor_name = input.vendor_name,
             phone_number = input.phone_number,
-            description = input.description,
+            #description = input.description,
             vendor_street = input.vendor_street,
             vendor_city = input.vendor_city,
-            location_pin = input.location_pin,
-            totalDeals = input.totalDeals,
-            totalActiveDeals = input.totalActiveDeals,
-            vendor_webpage = input.vendor_webpage,
-            vendor_fb_link = input.vendor_fb_link,
-            vendor_twitter_link = input.vendor_twitter_link,
+            vendor_pin_code = input.vendor_pin_code,
+            #totalDeals = input.totalDeals,
+            #totalActiveDeals = input.totalActiveDeals,
+            #vendor_webpage = input.vendor_webpage,
+            #vendor_fb_link = input.vendor_fb_link,
+            #vendor_twitter_link = input.vendor_twitter_link,
             vendor_status = "Approval Pending"
         )
         ok = "Vendor registered successfully"
         vendor.save()
-        return addVendor(vendor=vendor,ok=ok)
+        return registerVendor(vendor=vendor,ok=ok)
+class updateVendor(graphene.Mutation):
+    class Arguments:
+        input = VendorInput()
+    upd_vendor = graphene.Field(VendorType)
+    ok = graphene.String()
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor = Vendor.objects.get(user_name=input.user_name)
+        print(vendor,vendor.user_name,vendor.vendor_token)
+        if vendor:
+            if vendor.vendor_token == input.vendor_token:
+                if input.vendor_name:
+                    vendor.vendor_name = input.vendor_name
+                if input.description:
+                    vendor.description = input.description
+                if input.totalDeals:
+                    vendor.totalDeals = input.totalDeals
+                if input.totalActiveDeals:
+                    vendor.totalActiveDeals = input.totalActiveDeals
+                if input.vendor_email:
+                    vendor.vendor_email = input.vendor_email
+                if input.vendor_whatsapp:
+                    vendor.vendor_whatsapp = input.vendor_whatsapp
+                if input.vendor_webpage:
+                    vendor.vendor_webpage = input.vendor_webpage
+                if input.vendor_fb_link:
+                    vendor.vendor_fb_link = input.vendor_fb_link
+                if input.vendor_twitter_link:
+                    vendor.vendor_twitter_link = input.vendor_twitter_link
+                if input.vendor_status:
+                    vendor.vendor_status = input.vendor_status
+                ok = "vendor updated successfully"
+            else:
+                ok = "user must be authorized"
+                raise GraphQLError('User must be authenticated')
+       
+        vendor.save()
+        return updateVendor(upd_vendor=vendor,ok=ok)
+
+
+
+    
 class vendorLogin(graphene.Mutation):
     class Arguments:
         input=VendorInput()
@@ -478,7 +523,7 @@ class Mutation(ObjectType):
     verify_otp=verifyOTP.Field()
     add_interest=AddInterest.Field()
     add_device=addDevice.Field()
-    add_vendor = addVendor.Field()
+    register_vendor = registerVendor.Field()
     update_user=UpdateUser.Field()
     add_deal = AddDeal.Field()
     #token_auth = graphql_jwt.ObtainJSONWebToken.Field()
@@ -490,6 +535,7 @@ class Mutation(ObjectType):
     add_branch = addBranch.Field()
     vendor_login = vendorLogin.Field()
     forgot_password = updatePassword.Field()
+    upd_vendor = updateVendor.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
