@@ -69,6 +69,12 @@ class Area(models.Model):
     city = models.ForeignKey(to=Region, on_delete=models.CASCADE)
     def __str__(self):
         return self.name
+class Product(models.Model):
+    product_name = models.CharField(max_length=200,null=True)
+    product_category = models.ForeignKey(to=Interest, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.product_name
 
 '''class ServiceLoc(models.Model):
     loc_id=models.IntegerField()
@@ -247,11 +253,12 @@ class Yesdeal(models.Model):
     deal_srvc_city = models.ForeignKey(Region,on_delete=models.CASCADE,null=True)
     deal_srvc_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
-    deal_img1 = models.ImageField(upload_to='document',blank=True, null=True)
-    deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
-    deal_img3 = models.ImageField(upload_to='document',blank=True, null=True)
-    deal_img4 = models.ImageField(upload_to='document',blank=True, null=True)
-    deal_img5 = models.ImageField(upload_to='document',blank=True, null=True)
+    #deal_img = models.ForeignKey(Interest, on_delete=models.CASCADE)
+    deal_img1 = models.ImageField(upload_to='deal',blank=True, null=True)
+    #deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
+    #deal_img3 = models.ImageField(upload_to='document',blank=True, null=True)
+    #deal_img4 = models.ImageField(upload_to='document',blank=True, null=True)
+    #deal_img5 = models.ImageField(upload_to='document',blank=True, null=True)
     deal_start_time = models.DateTimeField(blank=True,default=now)
     deal_end_time = models.DateTimeField(blank=True,default=now)
     deal_avail_max = models.IntegerField(default=0)
