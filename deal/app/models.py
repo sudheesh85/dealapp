@@ -168,8 +168,9 @@ class Deal_img_vendor(models.Model):
 
 class Images(models.Model):
     img_title = models.CharField(max_length=50,null=True)
-    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True)
+    category = models.ForeignKey(Interest,on_delete=models.CASCADE,null=True)
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True,blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True,blank=True)
     image = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
     provider = models.TextField(choices=PROVIDER_TYPE, default='', blank=True)
     def __str__(self):

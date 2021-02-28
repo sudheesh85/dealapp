@@ -94,6 +94,7 @@ class ImageType(DjangoObjectType):
         interfaces=(relay.Node,)
 class ImagesInput(graphene.InputObjectType):
     img_title=graphene.String()
+    category = graphene.String()
     vendor = graphene.String()
     product = graphene.String()
     provider = Provider_Type()
@@ -564,6 +565,7 @@ class Query(ObjectType):
     jeep=graphene.String()
     userVendor = graphene.List(UserVendorType,user=graphene.String(required=True),vendor=graphene.String())
     dealImages = graphene.List(ImageType,vendor=graphene.String(),product=graphene.String(),provider=graphene.String())
+    catImages = graphene.List(ImageType,category = graphene.String(),provider=graphene.String())
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
@@ -588,6 +590,11 @@ class Query(ObjectType):
         user_obj = User.objects.get(userCD  = user)
         vendor_obj = Vendor.objects.get(vendor_cd = vendor)
         return User_Vendor.objects.filter(user=user_obj.id,vendor=vendor_obj.id)
+    def resolve_catImages(self,info,**kwargs):
+        category = kwargs.get("category")
+        provider = kwargs.get("provider")
+        cat_obj = Interest.objects.get(category_id=category)
+        return Images.objects.filter(category_id=cat_obj.id,provider=provider)
     def resolve_dealImages(self,info,**kwargs):
         print("here")
         vendor = kwargs.get("vendor")
