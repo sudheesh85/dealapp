@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -26,6 +26,9 @@ class Vendor_Status(graphene.Enum):
     A="Active"
     P = "Approval Pending"
     D = "Deactivated"
+class Provider_Type(graphene.Enum):
+    V='Vendor'
+    A='Admin'
 
 class YesdealType(DjangoObjectType):
     class Meta:
@@ -79,6 +82,23 @@ class DeviceType(DjangoObjectType):
         model=Device
         filter_fields=[]
         interfaces=(relay.Node,)
+class ProductType(DjangoObjectType):
+    class Meta:
+        model = Product
+        filter_fields=[]
+        interfaces=(relay.Node,)
+class ImageType(DjangoObjectType):
+    class Meta:
+        model = Images
+        filter_fields=[]
+        interfaces=(relay.Node,)
+class ImagesInput(graphene.InputObjectType):
+    img_title=graphene.String()
+    vendor = graphene.String()
+    product = graphene.String()
+    provider = Provider_Type()
+class ProductInput(graphene.InputObjectType):
+    pass
 class YesdealInput(graphene.InputObjectType):
     deal_sku_cd = graphene.String()
     deal_title = graphene.String()
@@ -543,12 +563,14 @@ class Query(ObjectType):
     deal = graphene.List(lambda:graphene.List(YesdealType),userCD=graphene.String(),token =graphene.String(required=True))
     jeep=graphene.String()
     userVendor = graphene.List(UserVendorType,user=graphene.String(required=True),vendor=graphene.String())
+    dealImages = graphene.List(ImageType,vendor=graphene.String(),product=graphene.String(),provider=graphene.String())
     #all_cars=graphene.List(CarType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)
     all_deal = DjangoFilterConnectionField(YesdealType)
     all_vendor = DjangoFilterConnectionField(VendorType)
+    all_images = DjangoFilterConnectionField(ImageType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
@@ -566,6 +588,16 @@ class Query(ObjectType):
         user_obj = User.objects.get(userCD  = user)
         vendor_obj = Vendor.objects.get(vendor_cd = vendor)
         return User_Vendor.objects.filter(user=user_obj.id,vendor=vendor_obj.id)
+    def resolve_dealImages(self,info,**kwargs):
+        print("here")
+        vendor = kwargs.get("vendor")
+        product = kwargs.get("product")
+        provider = kwargs.get("provider")
+        vendor_obj = Vendor.objects.get(vendor_cd = vendor)
+        prd_obj = Product.objects.get(product_cd = product)
+        print(vendor,product)
+        return Images.objects.filter(vendor_id=vendor_obj.id,product_id=prd_obj.id,provider=provider)
+        
     def resolve_deal(self,info,**kwargs):
         userCD = kwargs.get("userCD")
         user_token=kwargs.get("token")
@@ -608,5 +640,7 @@ class Query(ObjectType):
         return Device.objects.all()
     def resolve_all_vendor(self,info,**kwargs):
         return Vendor.objects.all()
+    def resolve_all_images(self,info,**kwargs):
+        return Images.objects.all()
 
 schema = Schema(query=Query,mutation=Mutation)

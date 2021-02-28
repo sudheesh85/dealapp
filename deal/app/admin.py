@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history,Product#,Vendor_login
+from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history,Product,Images
 #from .forms import UserInterestForm,DeviceForm
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -42,6 +42,10 @@ class BranchAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     pass
+@admin.register(Images)
+class ImagesAdmin(admin.ModelAdmin):
+    pass
+
 @admin.register(User_Vendor)
 class UserVendorAdmin(admin.ModelAdmin):
     list_display=('user','vendor','numberOfRedeemableCoins','user_is_followed','totalCollectedDeals')

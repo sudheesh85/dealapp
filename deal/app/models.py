@@ -23,8 +23,10 @@ USER_STATUS= (
     ('SUSPENDED','SUSPENDED')
 )
 DEAL_STATUS=(
-    ('OPEN','OPEN'),
-    ('CLOSED','CLOSED')
+    ('ACTIVE','ACTIVE'),
+    ('CONFIRMED','CONFIRMED'),
+    ('ON HOLD','ON HOLD'),
+    ('DEACTIVATE','DEACTIVATE')
 )
 DEVICE_TYPE=(
     ('{ANDROID}','{ANDROID}'),
@@ -46,6 +48,10 @@ VENDOR_STATUS = (
     ('Active','Active'),
     ('Approval Pending','Approval Pending'),
     ('Deactivated','Deactivated')
+)
+PROVIDER_TYPE = (
+    ('Vendor','Vendor'),
+    ('Admin','Admin')
 )
 
 class Interest(models.Model):
@@ -69,10 +75,18 @@ class Area(models.Model):
     city = models.ForeignKey(to=Region, on_delete=models.CASCADE)
     def __str__(self):
         return self.name
+
 class Product(models.Model):
+    #vendor_name = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    product_cd = models.CharField(max_length=6,null=True,blank=True)
     product_name = models.CharField(max_length=200,null=True)
     product_category = models.ForeignKey(to=Interest, on_delete=models.CASCADE)
     item_price=models.DecimalField(max_digits=10, decimal_places=2,default=0.0)
+    def save(self, *args, **kwargs):
+           ## This to check if it creates a new or updates an old instance
+           if self.pk is None:
+              self.product_cd = uid.make_id()
+           super(Product, self).save(*args, **kwargs)
     def __str__(self):
         return self.product_name
 
@@ -104,6 +118,7 @@ class Vendor(models.Model):
     vendor_img3 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
     vendor_img4 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
     vendor_img5 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+    product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
     vendor_email = models.CharField(max_length=100,blank=True)
@@ -132,6 +147,33 @@ class Vendor(models.Model):
 
     #def __str__(self):
         #return self.userName
+
+
+'''class Deal_img_category(models.Model):
+    img_title = models.CharField(max_length=50,null=True)
+    product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
+    img_category = models.ForeignKey(to=Interest, on_delete=models.CASCADE)
+    deal_img = models.ImageField(upload_to='yesdeal/media/deal',blank=True, null=True)
+
+    def __str__(self):
+        return self.deal_img
+class Deal_img_vendor(models.Model):
+    img_title = models.CharField(max_length=50,null=True)
+    vendor_name = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
+    deal_img = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+
+    def __str__(self):
+        return self.deal_img'''
+
+class Images(models.Model):
+    img_title = models.CharField(max_length=50,null=True)
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True)
+    image = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
+    provider = models.TextField(choices=PROVIDER_TYPE, default='', blank=True)
+    def __str__(self):
+        return self.img_title
 
 class User(models.Model):
     #photo = models.ImageField(upload_to='document',blank=True, null=True)
@@ -254,7 +296,7 @@ class Yesdeal(models.Model):
     deal_srvc_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
     #deal_img = models.ForeignKey(Interest, on_delete=models.CASCADE)
-    deal_img1 = models.ImageField(upload_to='yesdeal/media/deal',blank=True, null=True)
+    deal_img = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
     #deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
     #deal_img3 = models.ImageField(upload_to='document',blank=True, null=True)
     #deal_img4 = models.ImageField(upload_to='document',blank=True, null=True)
