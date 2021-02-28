@@ -591,9 +591,11 @@ class Query(ObjectType):
         vendor_obj = Vendor.objects.get(vendor_cd = vendor)
         return User_Vendor.objects.filter(user=user_obj.id,vendor=vendor_obj.id)
     def resolve_catImages(self,info,**kwargs):
+        print("here")
         category = kwargs.get("category")
         provider = kwargs.get("provider")
         cat_obj = Interest.objects.get(category_id=category)
+        print(cat_obj.id)
         return Images.objects.filter(category_id=cat_obj.id,provider=provider)
     def resolve_dealImages(self,info,**kwargs):
         print("here")
