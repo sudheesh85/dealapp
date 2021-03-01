@@ -173,6 +173,22 @@ class UserInput(graphene.InputObjectType):
 class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
 
+class uploadVendorImg(graphene.Mutation):
+   image = graphene.Field(ImageType)
+   @staticmethod
+   def mutate(root,info,input=None):
+       files = info.context.Files['image']
+       image = Image(
+           img_title=input.img_titile,
+           vendor = input.vendor,
+           product = input.product,
+           provider = input.provider)
+        image.save()
+        return uploadVendorImg(image = image)
+
+
+
+
 class addDevice(graphene.Mutation):
     class Arguments:
         #userCD=graphene.String()

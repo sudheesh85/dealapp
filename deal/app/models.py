@@ -118,7 +118,7 @@ class Vendor(models.Model):
     vendor_img3 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
     vendor_img4 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
     vendor_img5 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
-    product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
+    #product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)
     vendor_email = models.CharField(max_length=100,blank=True)
@@ -139,6 +139,20 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+
+class Product(models.Model):
+    vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    product_cd = models.CharField(max_length=6,null=True,blank=True)
+    product_name = models.CharField(max_length=200,null=True)
+    product_category = models.ForeignKey(to=Interest, on_delete=models.CASCADE)
+    item_price=models.DecimalField(max_digits=10, decimal_places=2,default=0.0)
+    def save(self, *args, **kwargs):
+           ## This to check if it creates a new or updates an old instance
+           if self.pk is None:
+              self.product_cd = uid.make_id()
+           super(Product, self).save(*args, **kwargs)
+    def __str__(self):
+        return self.product_name
 #class Vendor_login(models.Model):
     #user_name = models.CharField(max_length=20,null=True,unique=True,blank=True)
     #password = models.CharField(max_length=20,null=True,blank=True)
