@@ -302,6 +302,7 @@ class Branch(models.Model):
 
 class Yesdeal(models.Model):
     #deal_id = models.IntegerField()
+    deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_title=models.CharField(max_length=500,null=True)
     deal_desc= models.TextField(blank=True)
     deal_org_price=models.DecimalField(max_digits=10, decimal_places=2)
@@ -310,6 +311,7 @@ class Yesdeal(models.Model):
     deal_srvc_city = models.ForeignKey(Region,on_delete=models.CASCADE,null=True)
     deal_srvc_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True)
     #deal_img = models.ForeignKey(Interest, on_delete=models.CASCADE)
     deal_img = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
     #deal_img2 = models.ImageField(upload_to='document',blank=True, null=True)
@@ -323,7 +325,7 @@ class Yesdeal(models.Model):
     deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
     deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
-    deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    Alloted_deal_per_coupon = models.IntegerField(default=0)
     deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
     deal_status = models.TextField(choices=DEAL_STATUS, default='', blank=True)
     def save(self,*args,**kwargs):

@@ -42,11 +42,13 @@ class BranchAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     exclude = ('product_cd',)
-    list_dispaly = ('product_name','vendor','product_category','item_price')
+    list_display = ('vendor','product_name','item_price')
+    list_filter = ('vendor','product_name')
     #pass
 @admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
     list_display = ('img_title','category','vendor','product')
+    list_filter = ('category','vendor','product')
     #pass
 
 @admin.register(User_Vendor)
