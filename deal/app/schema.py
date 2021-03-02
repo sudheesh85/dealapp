@@ -99,7 +99,12 @@ class ImagesInput(graphene.InputObjectType):
     product = graphene.String()
     provider = Provider_Type()
 class ProductInput(graphene.InputObjectType):
-    pass
+    vendor = graphene.String()
+    product_cd = graphene.String()
+    product_name = graphene.String()
+    product_category = graphene.String()
+    item_price = graphene.Float()
+    token = graphene.String()
 class YesdealInput(graphene.InputObjectType):
     deal_sku_cd = graphene.String()
     deal_title = graphene.String()
@@ -172,7 +177,31 @@ class UserInput(graphene.InputObjectType):
     
 class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
-
+class addProduct(graphene.Mutation):
+    class Arguments:
+        input = ProductInput()
+    product = graphene.Field(ProductType)    
+    ok = graphene.String()
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor_obj = Vendor.objects.get(vendor_cd=input.vendor)
+        cat_obj = Interest.objects.get(category_id = input.product_category)
+        if vendor_obj and vendor_obj.vendor_status == 'Active':
+            if vendor_obj.vendor_token == input.token :
+                product = Product.objects.create(
+                    vendor = vendor_obj,
+                    product_name = input.product_name,
+                    product_category = cat_obj,
+                    item_price = input.item_price
+                )
+                ok="Product added successfuly"
+            else:
+                raise GraphQLError('User must be authenticated')
+        else:
+            raise GraphQLError('Vendor must be registered')
+        product.save()
+        return addProduct(product=product,ok=ok)
+                
 class uploadVendorImg(graphene.Mutation):
     image = graphene.Field(ImageType)
     @staticmethod
@@ -264,10 +293,6 @@ class updateVendor(graphene.Mutation):
        
         vendor.save()
         return updateVendor(upd_vendor=vendor,ok=ok)
-
-
-
-    
 class vendorLogin(graphene.Mutation):
     class Arguments:
         input=VendorInput()
@@ -571,6 +596,7 @@ class Mutation(ObjectType):
     forgot_password = updatePassword.Field()
     upd_vendor = updateVendor.Field()
     upload_image = uploadVendorImg.Field()
+    add_Product = addProduct.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())

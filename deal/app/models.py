@@ -76,7 +76,7 @@ class Area(models.Model):
     def __str__(self):
         return self.name
 
-class Product(models.Model):
+'''class Product(models.Model):
     #vendor_name = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     product_cd = models.CharField(max_length=6,null=True,blank=True)
     product_name = models.CharField(max_length=200,null=True)
@@ -88,7 +88,7 @@ class Product(models.Model):
               self.product_cd = uid.make_id()
            super(Product, self).save(*args, **kwargs)
     def __str__(self):
-        return self.product_name
+        return self.product_name'''
 
 '''class ServiceLoc(models.Model):
     loc_id=models.IntegerField()
