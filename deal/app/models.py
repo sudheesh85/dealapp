@@ -59,7 +59,7 @@ class Interest(models.Model):
     category_id=models.IntegerField(default=100,unique=True)
     category_name=models.CharField(max_length=50,null=True,unique=True)
     image_title = models.CharField(max_length=50,null=True)
-    category_img = models.ImageField(upload_to='document',blank=True, null=True)
+    category_img = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
     #@property
     #def category_id(self):
        #return self.id+100
@@ -113,11 +113,11 @@ class Vendor(models.Model):
     vendor_street = models.CharField(max_length=100,blank=True)
     vendor_city = models.CharField(max_length=100,blank=True)
     vendor_pin_code = models.CharField(max_length=100,blank=True)
-    vendor_img1 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
-    vendor_img2 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
-    vendor_img3 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
-    vendor_img4 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
-    vendor_img5 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+    vendor_img = models.ImageField(upload_to='yesdeal/media/gallory',blank=True, null=True)
+    #vendor_img2 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+    #vendor_img3 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+    #vendor_img4 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
+    #vendor_img5 = models.ImageField(upload_to='yesdeal/media/vendor',blank=True, null=True)
     #product_name = models.ForeignKey(to=Product, on_delete=models.CASCADE,null=True)
     totalDeals=models.CharField(max_length=5,blank=True)
     totalActiveDeals=models.CharField(max_length=5,blank=True)

@@ -174,20 +174,17 @@ class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
 
 class uploadVendorImg(graphene.Mutation):
-   image = graphene.Field(ImageType)
-   @staticmethod
-   def mutate(root,info,input=None):
-       files = info.context.Files['image']
-       image = Image(
-           img_title=input.img_titile,
-           vendor = input.vendor,
-           product = input.product,
-           provider = input.provider)
+    image = graphene.Field(ImageType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        files = info.context.Files['image']
+        image = Image(
+            img_title=input.img_titile,
+            vendor = input.vendor,
+            product = input.product,
+            provider = input.provider)
         image.save()
         return uploadVendorImg(image = image)
-
-
-
 
 class addDevice(graphene.Mutation):
     class Arguments:
@@ -573,6 +570,7 @@ class Mutation(ObjectType):
     vendor_login = vendorLogin.Field()
     forgot_password = updatePassword.Field()
     upd_vendor = updateVendor.Field()
+    upload_image = uploadVendorImg.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
