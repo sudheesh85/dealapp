@@ -606,13 +606,14 @@ class Query(ObjectType):
     userVendor = graphene.List(UserVendorType,user=graphene.String(required=True),vendor=graphene.String())
     dealImages = graphene.List(ImageType,vendor=graphene.String(),product=graphene.String(),provider=graphene.String())
     catImages = graphene.List(ImageType,category = graphene.String(),provider=graphene.String())
-    #all_cars=graphene.List(CarType)
+    vendor_product = graphene.List(ProductType,vendor = graphene.String())
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)
     all_deal = DjangoFilterConnectionField(YesdealType)
     all_vendor = DjangoFilterConnectionField(VendorType)
     all_images = DjangoFilterConnectionField(ImageType)
+    all_product = DjangoFilterConnectionField(ProductType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
@@ -646,6 +647,10 @@ class Query(ObjectType):
         prd_obj = Product.objects.get(product_cd = product)
         print(vendor,product)
         return Images.objects.filter(vendor_id=vendor_obj.id,product_id=prd_obj.id,provider=provider)
+    def resolve_vendor_product(self,info,**kwargs):
+        vendor = kwargs.get("vendor")
+        vendor_obj = Vendor.objects.get(vendor_cd = vendor)
+        return Product.objects.filter(vendor_id = vendor_obj.id)
         
     def resolve_deal(self,info,**kwargs):
         userCD = kwargs.get("userCD")
@@ -691,5 +696,7 @@ class Query(ObjectType):
         return Vendor.objects.all()
     def resolve_all_images(self,info,**kwargs):
         return Images.objects.all()
+    def resolve_all_product(self,info,**kwargs):
+        return Product.objects.all()
 
 schema = Schema(query=Query,mutation=Mutation)
