@@ -307,6 +307,7 @@ class vendorLogin(graphene.Mutation):
                 ok = "login successfully"
             else:
                 ok = "password is incorrect"
+                raise GraphQLError('password is incorrect')
 
         else:
             ok = "Either vendor does not exist or active in the system "

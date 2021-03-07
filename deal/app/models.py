@@ -353,6 +353,7 @@ class User_Deal(models.Model):
     is_collected = models.BooleanField(null=True,default=False)
     collected_at = models.DateTimeField(blank=True,default=now)
     QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
+    #is_deal_confirmed = models.BooleanField(null=True,default=False)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
     user_wah_points = models.IntegerField(default=0)
     deal_scratch_status = models.BooleanField(null=True,default=False)
