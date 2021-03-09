@@ -53,6 +53,12 @@ PROVIDER_TYPE = (
     ('Vendor','Vendor'),
     ('Admin','Admin')
 )
+DEAL_PREFRENCE = (
+    (1,'All in the City'),
+    (2,'To Followers'),
+    (3,'Those who already visited my shop'),
+    (4,'Those who purchased above Rs.500')
+)
 
 class Interest(models.Model):
     
@@ -304,6 +310,12 @@ class Branch(models.Model):
         return self.branch_name
 
 class Yesdeal(models.Model):
+    DEAL_PREFERENCE = (
+        ('All in the City','All in the City'),
+        ('To Followers','To Followers'),
+        ('Those who already visited my shop','Those who already visited my shop'),
+        ('Those who purchased above Rs.500','Those who purchased above Rs.500')
+    )
     #deal_id = models.IntegerField()
     deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_title=models.CharField(max_length=500,null=True)
@@ -312,7 +324,7 @@ class Yesdeal(models.Model):
     deal_spl_price=models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     deal_offer_percentage = models.DecimalField(max_digits=5,decimal_places=2,default=0.0)
     deal_srvc_city = models.ForeignKey(Region,on_delete=models.CASCADE,null=True)
-    deal_srvc_area = models.ForeignKey(Area,on_delete=models.CASCADE,null=True)
+    deal_srvc_area = models.ManyToManyField(Area, verbose_name="service_area")
     deal_category = models.ForeignKey(Interest, on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True)
     #deal_img = models.ForeignKey(Interest, on_delete=models.CASCADE)
@@ -328,8 +340,10 @@ class Yesdeal(models.Model):
     deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
     deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
+    deal_preference = models.TextField(null=True,help_text="It's a good manners to write it")
     Alloted_deal_per_coupon = models.IntegerField(default=0)
-    deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
+    #deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
+    deal_available_branch = models.ManyToManyField(Branch, verbose_name="vendor_branches")
     deal_status = models.TextField(choices=DEAL_STATUS, default='', blank=True)
     def save(self,*args,**kwargs):
         if self.pk is None:
@@ -353,8 +367,9 @@ class User_Deal(models.Model):
     is_collected = models.BooleanField(null=True,default=False)
     collected_at = models.DateTimeField(blank=True,default=now)
     QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
-    #is_deal_confirmed = models.BooleanField(null=True,default=False)
+    is_deal_confirmed = models.BooleanField(null=True,default=False)
     is_deal_redeemed = models.BooleanField(null=True,default=False)
+    deal_quantity = models.IntegerField(default=0)
     user_wah_points = models.IntegerField(default=0)
     deal_scratch_status = models.BooleanField(null=True,default=False)
 

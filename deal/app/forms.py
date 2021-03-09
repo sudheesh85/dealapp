@@ -1,10 +1,26 @@
 from django.contrib.auth import get_user_model
-#from .models import Interest,User,Device
+from .models import Yesdeal
 from entangled.forms import EntangledModelForm
 from multiselectfield import MultiSelectFormField,MultiSelectField
 from prettyjson import PrettyJSONWidget
 from django import forms
-from django.forms import fields, models
+from django.forms import fields, models,ModelForm
+    
+
+class deal_Form(ModelForm):
+    
+    deal_preference = forms.MultipleChoiceField(choices=Yesdeal.DEAL_PREFERENCE)#, widget=forms.SelectMultiple)
+    def __init__(self, *args, **kwargs):
+        super(deal_Form, self).__init__(*args, **kwargs)
+        # maybe you can set initial with self.fields['my_choices'].initial = initial 
+        # but it doesn't work wity dynamic choices
+        obj = kwargs.get('deal_preference')
+        if obj:
+            initial = [i for i in obj.deal_preference.split(',')]
+            self.initial['preference'] = initial
+
+    def clean_lead_fields(self):
+        return ','.join(self.cleaned_data.get('preference', []))
 
 '''class UserInterestForm(forms.ModelForm):
     class Meta:

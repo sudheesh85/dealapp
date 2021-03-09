@@ -8,7 +8,7 @@ from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history,Product,Images
-#from .forms import UserInterestForm,DeviceForm
+from .forms import deal_Form
 from multiselectfield import MultiSelectFormField
 from .sms import sms
 from .fcm import FCM
@@ -35,7 +35,9 @@ class AreaAdmin(admin.ModelAdmin):
     pass
 @admin.register(Yesdeal)
 class YesdealAdmin(admin.ModelAdmin):
-    pass
+    form = deal_Form
+    list_display=('deal_title','deal_preference')
+    #pass
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
     pass
