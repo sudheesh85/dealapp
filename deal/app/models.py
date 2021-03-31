@@ -81,6 +81,8 @@ class Area(models.Model):
     city = models.ForeignKey(to=Region, on_delete=models.CASCADE)
     def __str__(self):
         return self.name
+class Deal_scratch(models.Model):
+    scratch_logo = models.ImageField(upload_to='yesdeal/media/logo',blank=True, null=True)
 
 '''class Product(models.Model):
     #vendor_name = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)

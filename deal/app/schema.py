@@ -29,6 +29,18 @@ class Vendor_Status(graphene.Enum):
 class Provider_Type(graphene.Enum):
     V='Vendor'
     A='Admin'
+class Deal_Status(graphene.Enum):
+    A = 'ACTIVE'
+    C = 'CONFIRMED'
+    H = 'ON HOLD'
+    D = 'DEACTIVATE'
+class Age_Limit(graphene.Enum):
+    A = '18-30'
+    B = '31-40'
+    C = '41-50'
+    D = '51-60'
+    E = '61-Above'
+
 
 class YesdealType(DjangoObjectType):
     class Meta:
@@ -114,7 +126,17 @@ class YesdealInput(graphene.InputObjectType):
     deal_category = graphene.Int()
     deal_count = graphene.Int()
     deal_vendor = graphene.Int()
+    product = graphene.String()
     deal_available_branch = graphene.Int()
+    deal_start_time = graphene.DateTime()
+    deal_end_time = graphene.DateTime()
+    deal_avail_max = graphene.Int()
+    deal_collected_till = graphene.Int()
+    deal_category_on_age = Age_Limit()
+    deal_category_on_gender = Gender()
+    deal_preference = graphene.String()
+    Alloted_deal_per_coupon = graphene.Int()
+    deal_status = Deal_Status()
 class VendorInput(graphene.InputObjectType):
     user_name = graphene.String()
     password = graphene.String()
@@ -562,6 +584,7 @@ class AddDeal(graphene.Mutation):
         branch_obj = Branch.objects.get(id=input.deal_available_branch)
         city_obj = Region.objects.get(id=input.deal_srvc_city)
         area_obj = Area.objects.get(id=input.deal_srvc_area)
+        prd_obj = Product.objects.get(id = input.product)
         #input.deal_vendor = vendor
         deal=Yesdeal.objects.create(
             deal_vendor=vendor_obj,
@@ -571,9 +594,19 @@ class AddDeal(graphene.Mutation):
             deal_org_price = input.deal_org_price,
             deal_spl_price = input.deal_spl_price,
             deal_category=category_obj,
+            product = prd_obj,
             deal_available_branch = branch_obj,
             deal_srvc_city = city_obj,
-            deal_srvc_area = area_obj)
+            deal_srvc_area = area_obj,
+            deal_start_time = input.deal_start_time,
+            deal_end_time = input.deal_end_time,
+            deal_avail_max = input.deal_avail_max,
+            deal_collected_till = input.deal_collected_till,
+            deal_category_on_age = input.deal_category_on_age,
+            deal_category_on_gender = input.deal_category_on_gender,
+            deal_preference = input.deal_preference,
+            Alloted_deal_per_coupon = input.Alloted_deal_per_coupon,
+            deal_status = input.deal_status)
         #if deal:
         deal.save()
         return AddDeal(deal=deal)
