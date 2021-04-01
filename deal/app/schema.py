@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product,Deal_scratch
 from .userid_gen import uid,otp
 from .passwd_gen import tok
 from datetime import datetime as dt
@@ -77,6 +77,11 @@ class RegionType(DjangoObjectType):
 class AreaType(DjangoObjectType):
     class Meta:
         model = Area
+        filter_fields=[]
+        interfaces = (relay.Node,)
+class LogoType(DjangoObjectType):
+    class Meta:
+        model = Deal_scratch
         filter_fields=[]
         interfaces = (relay.Node,)
 class SharedType(DjangoObjectType):
@@ -648,10 +653,12 @@ class Query(ObjectType):
     all_vendor = DjangoFilterConnectionField(VendorType)
     all_images = DjangoFilterConnectionField(ImageType)
     all_product = DjangoFilterConnectionField(ProductType)
+    get_logo = DjangoFilterConnectionField(LogoType)
 
     #def resolve_car(self,info):
         #return Car.objects.all()
-
+    def resolve_get_logo(self,info,**kwargs):
+        return Deal_scratch.objects.all()
     def resolve_user(self, info,**kwargs):
         userCD=kwargs.get("userCD")
         user = info.context.user
