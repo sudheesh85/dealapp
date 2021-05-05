@@ -145,6 +145,8 @@ class YesdealInput(graphene.InputObjectType):
 class VendorInput(graphene.InputObjectType):
     user_name = graphene.String()
     password = graphene.String()
+    user_pin = graphene.String()
+    user_pin_verified = graphene.Boolean()
     vendor_token = graphene.String()
     vendor_name=graphene.String()
     phone_number = graphene.String()
@@ -204,6 +206,8 @@ class UserInput(graphene.InputObjectType):
     
 class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
+    user_lat = graphene.Decimal()
+    user_long = graphene.Decimal()
 class addProduct(graphene.Mutation):
     class Arguments:
         input = ProductInput()
@@ -266,6 +270,7 @@ class registerVendor(graphene.Mutation):
         vendor = Vendor(
             user_name = input.user_name,
             password = input.password,
+            user_pin = input.user_pin,
             vendor_name = input.vendor_name,
             phone_number = input.phone_number,
             #description = input.description,
@@ -509,6 +514,25 @@ class UpdateUser(graphene.Mutation):
         else:
             raise GraphQLError('User must be authenticated')
 
+class verifyPIN(graphene.Mutation):
+    class Arguments:
+        input = VendorInput()
+    ok = graphene.String()
+    vendor = graphene.Field(VendorType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor = Vendor.objects.get(user_name=input.user_name)
+        if vendor:
+            if vendor.user_pin == input.user_pin:
+                vendor.pin_verified = True
+                ok = "PIN Verified"
+            else:
+                vendor.pin_verified = False
+                ok = "Incorrect PIN"
+        else:
+            ok = "Vendor doesnot exist"
+        vendor.save()
+        return verifyPIN(vendor = vendor,ok=ok)
 
 class verifyOTP(graphene.Mutation):
     class Arguments:
@@ -636,6 +660,7 @@ class Mutation(ObjectType):
     upd_vendor = updateVendor.Field()
     upload_image = uploadVendorImg.Field()
     add_Product = addProduct.Field()
+    verify_PIN = verifyPIN.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
