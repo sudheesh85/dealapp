@@ -286,8 +286,8 @@ class User_Vendor(models.Model):
 class Device(models.Model):
     userCD=models.ForeignKey(User,on_delete=models.CASCADE)
     device=JSONField()
-    user_lat = models.DecimalField(max_digits=9, decimal_places=6,null=True)
-    user_long = models.DecimalField(max_digits=9, decimal_places=6,null=True)
+    #user_lat = models.DecimalField(max_digits=9, decimal_places=6,null=True)
+    #user_long = models.DecimalField(max_digits=9, decimal_places=6,null=True)
 
     def __str__(self):
         return str(self.userCD)

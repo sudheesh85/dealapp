@@ -206,8 +206,8 @@ class UserInput(graphene.InputObjectType):
     
 class DeviceInput(graphene.InputObjectType):
     device=graphene.JSONString()
-    user_lat = graphene.Decimal()
-    user_long = graphene.Decimal()
+    user_lat = graphene.Float()
+    user_long = graphene.Float()
 class addProduct(graphene.Mutation):
     class Arguments:
         input = ProductInput()
@@ -257,7 +257,7 @@ class addDevice(graphene.Mutation):
         print(device.device)
         user=User.objects.get(mobile=input.mobile)
         print(user.userCD)
-        device=Device.objects.create(userCD=user,device=device.device)
+        device=Device.objects.create(userCD=user,device=device)
         device.save()
         return addDevice(device=device)
 class registerVendor(graphene.Mutation):
