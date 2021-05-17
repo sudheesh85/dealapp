@@ -321,7 +321,7 @@ class Yesdeal(models.Model):
         ('Those who already visited my shop','Those who already visited my shop'),
         ('Those who purchased above Rs.500','Those who purchased above Rs.500')
     )
-    #deal_id = models.IntegerField()
+    deal_id = models.CharField(max_length=6,null=True,unique=True,blank=True)
     deal_vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     deal_title=models.CharField(max_length=500,null=True)
     deal_desc= models.TextField(blank=True)
@@ -344,7 +344,7 @@ class Yesdeal(models.Model):
     deal_collected_till = models.IntegerField(default=0)
     deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
     deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
-    deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
+    #deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
     deal_preference = models.TextField(null=True,help_text="It's a good manners to write it")
     Alloted_deal_per_coupon = models.IntegerField(default=0)
     #deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
@@ -352,6 +352,7 @@ class Yesdeal(models.Model):
     deal_status = models.TextField(choices=DEAL_STATUS, default='', blank=True)
     def save(self,*args,**kwargs):
         if self.pk is None:
+            self.deal_id = uid.make_id()
             if self.deal_offer_percentage:
                 self.deal_spl_price = self.deal_org_price - (self.deal_org_price * (self.deal_offer_percentage/100))
             else:

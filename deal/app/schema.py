@@ -3,9 +3,9 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product,Deal_scratch
+from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product,Deal_scratch,User_Deal
 from .userid_gen import uid,otp
-from .passwd_gen import tok
+from .passwd_gen import tok,qr
 from datetime import datetime as dt
 from django.utils import timezone
 from graphql import GraphQLError
@@ -41,7 +41,11 @@ class Age_Limit(graphene.Enum):
     D = '51-60'
     E = '61-Above'
 
-
+class UserDealType(DjangoObjectType):
+    class Meta:
+        model = User_Deal
+        filter_fields=[]
+        interfaces = (relay.Node,)
 class YesdealType(DjangoObjectType):
     class Meta:
         model = Yesdeal
@@ -122,6 +126,16 @@ class ProductInput(graphene.InputObjectType):
     product_category = graphene.String()
     item_price = graphene.Float()
     token = graphene.String()
+class UserDealInput(graphene.InputObjectType):
+    user = graphene.String()
+    vendor = graphene.String()
+    deal = graphene.String()
+    is_collected = graphene.Boolean()
+    is_deal_confirmed = graphene.Boolean()
+    is_deal_redeemed = graphene.Boolean()
+    deal_quantity = graphene.Int()
+    user_wah_points = graphene.Int()
+    deal_scratch_status = graphene.Boolean()
 class YesdealInput(graphene.InputObjectType):
     deal_sku_cd = graphene.String()
     deal_title = graphene.String()
@@ -639,6 +653,61 @@ class AddDeal(graphene.Mutation):
         #if deal:
         deal.save()
         return AddDeal(deal=deal)
+class collectDeal(graphene.Mutation):
+    class Arguments:
+        input = UserDealInput()
+    ok = graphene.String()
+    deal = graphene.Field(UserDealType)
+    @staticmethod
+    def mutate(root,info,input=None):
+        vendor_obj = Vendor.objects.get(vendor_cd = input.vendor)
+        user_obj = User.objects.get(userCD  = input.user)
+        deal_obj = Yesdeal.objects.get(deal_id = input.deal)
+        userdeal = User_Deal.objects.create(
+            user = user_obj,
+            deal = deal_obj,
+            vendor = vendor_obj,
+            is_collected = input.is_collected,
+            QRCode = qr.qrcode(user_obj.userCD,deal_obj.deal_id),
+            #is_deal_confirmed = input.is_deal_confirmed,
+            #is_deal_redeemed = input.is_deal_redeemed,
+            deal_quantity = input.deal_quantity,
+            #user_wah_points = input.user_wah_points,
+            #deal_scratch_status = input.deal_scratch_status
+        )
+        userdeal.save()
+        ok = "Entry made on user_deal table"
+        return addUserDeal(deal = userdeal,ok=ok)
+class upd_collect_deal(graphene.Mutation):
+    class Arguments:
+        input = UserDealInput()
+    upd_deal = graphene.Field(UserDealType)
+    ok = graphene.String()
+    @staticmethod
+    def mutate(root,info,input=None):
+        deal_obj = Yesdeal.objects.get(deal_id = input.deal)
+        user_obj = User.objects.get(userCD  = input.user)
+        upd_deal = User_Deal.objects.filter(user = user_obj.id,deal=deal_obj.id)
+        
+        #deal_obj = Yesdeal.objects.get(deal_id = input.deal)
+        if upd_deal:
+            print(upd_deal[0].is_deal_confirmed,upd_deal[0].user_wah_points,input.user_wah_points)
+            if isinstance(input.is_deal_confirmed,bool):
+                upd_deal[0].is_deal_confirmed = input.is_deal_confirmed
+            if isinstance(input.is_deal_redeemed,bool):
+                upd_deal[0].is_deal_redeemed = input.is_deal_redeemed
+            if input.user_wah_points:
+                print(input.user_wah_points)
+                upd_deal[0].user_wah_points = input.user_wah_points
+                print(upd_deal[0].user_wah_points)
+            if isinstance(input.deal_scratch_status,bool):
+                upd_deal[0].deal_scratch_status = input.deal_scratch_status
+        else:
+            ok = "user or deal does not exist"
+        upd_deal[0].save()
+        ok="use deal table updated"
+        print(upd_deal[0].user_wah_points)
+        return upd_collect_deal(upd_deal = upd_deal[0],ok=ok )
 class Mutation(ObjectType):
     #add_user = AddUser.Field()
     Resend_otp=ResendOTP.Field()
@@ -661,6 +730,8 @@ class Mutation(ObjectType):
     upload_image = uploadVendorImg.Field()
     add_Product = addProduct.Field()
     verify_PIN = verifyPIN.Field()
+    collect_deal = collectDeal.Field()
+    update_collect = upd_collect_deal.Field()
 
 class Query(ObjectType):
     user = graphene.Field(UserType, userCD=graphene.String())
