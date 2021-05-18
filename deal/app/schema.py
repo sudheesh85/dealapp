@@ -742,6 +742,7 @@ class Query(ObjectType):
     dealImages = graphene.List(ImageType,vendor=graphene.String(),product=graphene.String(),provider=graphene.String())
     catImages = graphene.List(ImageType,category = graphene.String(),provider=graphene.String())
     vendor_product = graphene.List(ProductType,vendor = graphene.String())
+    get_user_deal = graphene.List(UserDealType,user=graphene.String(),deal=graphene.String())
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)
@@ -768,6 +769,12 @@ class Query(ObjectType):
         user_obj = User.objects.get(userCD  = user)
         vendor_obj = Vendor.objects.get(vendor_cd = vendor)
         return User_Vendor.objects.filter(user=user_obj.id,vendor=vendor_obj.id)
+    def resolve_get_user_deal(self,info,**kwargs):
+        user = kwargs.get("user")
+        deal = kwargs.get("deal")
+        deal_obj = Yesdeal.objects.get(deal_id = deal)
+        user_obj = User.objects.get(userCD  = user)
+        return User_Deal.objects.filter(user=user_obj.id,deal=deal_obj.id)
     def resolve_catImages(self,info,**kwargs):
         print("here")
         category = kwargs.get("category")
