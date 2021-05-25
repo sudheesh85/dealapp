@@ -39,7 +39,7 @@ class AreaAdmin(admin.ModelAdmin):
 @admin.register(Yesdeal)
 class YesdealAdmin(admin.ModelAdmin):
     form = deal_Form
-    list_display=('deal_title','deal_preference')
+    list_display=('deal_title','deal_vendor')
     #pass
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
@@ -55,7 +55,9 @@ class ImagesAdmin(admin.ModelAdmin):
     list_display = ('img_title','category','vendor','product')
     list_filter = ('category','vendor','product')
     #pass
-
+#@admin.register(User_Feedback)
+#class UserFeedbackAdmin(admin.ModelAdmin):
+#    pass
 @admin.register(User_Vendor)
 class UserVendorAdmin(admin.ModelAdmin):
     list_display=('user','vendor','numberOfRedeemableCoins','user_is_followed','totalCollectedDeals')
@@ -103,7 +105,7 @@ class DeviceAdmin(admin.ModelAdmin):
         return obj.device'''
 
 class UserAdmin(admin.ModelAdmin):
-    exclude = ('created_at','userCD','user_token')   # exclude list of fields those not display in admin form
+    exclude = ('created_at','user_token')   # exclude list of fields those not display in admin form
     # fields = ('name', 'address', 'gender','age')  # list of fields display in admin form
     # readonly_fields = ('age',)  # list of fields as readonly [NonEditable fields]
     sortable_by = 'id'  # field 'id' sorted by descending order

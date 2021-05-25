@@ -40,6 +40,12 @@ class Age_Limit(graphene.Enum):
     C = '41-50'
     D = '51-60'
     E = '61-Above'
+class Rating(graphene.Enum):
+    1 = '*'
+    2 = '**'
+    3 = '***'
+    4 = '****'
+    5 = '*****'
 
 class UserDealType(DjangoObjectType):
     class Meta:
@@ -135,6 +141,9 @@ class UserDealInput(graphene.InputObjectType):
     is_deal_redeemed = graphene.Boolean()
     deal_quantity = graphene.Int()
     user_wah_points = graphene.Int()
+    user_rating = Rating()
+    rating_status = graphene.String()
+    user_review = graphene.List(graphene.String)
     deal_scratch_status = graphene.Boolean()
 class YesdealInput(graphene.InputObjectType):
     deal_sku_cd = graphene.String()
@@ -671,13 +680,13 @@ class collectDeal(graphene.Mutation):
             QRCode = qr.qrcode(user_obj.userCD,deal_obj.deal_id),
             #is_deal_confirmed = input.is_deal_confirmed,
             #is_deal_redeemed = input.is_deal_redeemed,
-            deal_quantity = input.deal_quantity,
+            #deal_quantity = input.deal_quantity,
             #user_wah_points = input.user_wah_points,
             #deal_scratch_status = input.deal_scratch_status
         )
         userdeal.save()
         ok = "Entry made on user_deal table"
-        return addUserDeal(deal = userdeal,ok=ok)
+        return collectDeal(deal = userdeal,ok=ok)
 class upd_collect_deal(graphene.Mutation):
     class Arguments:
         input = UserDealInput()
@@ -700,8 +709,16 @@ class upd_collect_deal(graphene.Mutation):
                 print(input.user_wah_points)
                 upd_deal[0].user_wah_points = input.user_wah_points
                 print(upd_deal[0].user_wah_points)
+            if input.deal_quantity:
+                upd_deal[0].deal_quantity = input.deal_quantity
             if isinstance(input.deal_scratch_status,bool):
                 upd_deal[0].deal_scratch_status = input.deal_scratch_status
+            if input.user_rating:
+                upd_deal[0].user_rating = input.user_rating
+            if input.rating_status:
+                upd_deal[0].rating_status = input.rating_status
+            if input.user_review:
+                upd_deal[0].user_review = input.user_review
         else:
             ok = "user or deal does not exist"
         upd_deal[0].save()

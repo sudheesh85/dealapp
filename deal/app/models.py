@@ -59,6 +59,13 @@ DEAL_PREFRENCE = (
     (3,'Those who already visited my shop'),
     (4,'Those who purchased above Rs.500')
 )
+RATING = (
+    (1 , '*'),
+    (2 , '**'),
+    (3 , '***'),
+    (4 , '****'),
+    (5 , '*****')
+)
 
 class Interest(models.Model):
     
@@ -345,7 +352,7 @@ class Yesdeal(models.Model):
     deal_category_on_age = models.TextField(choices = AGE_LIMIT,default='',blank=True)
     deal_category_on_gender = models.TextField(choices=GENDER_STATUS, default='', blank=True)
     #deal_QRCode = models.CharField(max_length=20, unique=True,blank=True, null=True)
-    deal_preference = models.TextField(null=True,help_text="It's a good manners to write it")
+    deal_preference = models.TextField(blank=True,null=True,help_text="It's a good manners to write it")
     Alloted_deal_per_coupon = models.IntegerField(default=0)
     #deal_available_branch = models.ForeignKey(Branch,on_delete=models.CASCADE,null=True)
     deal_available_branch = models.ManyToManyField(Branch, verbose_name="vendor_branches")
@@ -366,6 +373,13 @@ class Yesdeal(models.Model):
     def __str__(self):
         return self.deal_title
 
+'''class User_Feedback(models.Model):
+    user_rating = models.CharField(max_length=3,null=True,unique=True,blank=True)
+    user_comment = ArrayField(models.CharField(max_length=20,null=True,blank=True))
+
+    def __str__(self):
+        return self.user_rating'''
+
 class User_Deal(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     deal = models.ForeignKey(Yesdeal,on_delete=models.CASCADE,null=True)
@@ -378,8 +392,13 @@ class User_Deal(models.Model):
     deal_quantity = models.IntegerField(default=0)
     user_wah_points = models.IntegerField(default=0)
     deal_scratch_status = models.BooleanField(null=True,default=False)
+    #user_rating = models.ForeignKey(User_Feedback,on_delete=models.CASCADE,null=True)
+    user_rating = models.CharField(max_length=6,choices=RATING,default='',null=True)
+    rating_status = models.CharField(max_length=20,default='',blank=True)
+    user_review = models.TextField(blank=True,null=True,help_text="It's a good manners to write it")
 
     def __str__(self):
         return str(self.user)
+
 
 

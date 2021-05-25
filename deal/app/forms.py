@@ -18,9 +18,11 @@ class deal_Form(ModelForm):
         if obj:
             initial = [i for i in obj.deal_preference.split(',')]
             self.initial['preference'] = initial
+        else:
+            self.initial['preference'] = ''
 
-    def clean_lead_fields(self):
-        return ','.join(self.cleaned_data.get('preference', []))
+    '''def clean_lead_fields(self):
+        return ','.join(self.cleaned_data.get('preference', []))'''
 
 '''class UserInterestForm(forms.ModelForm):
     class Meta:
