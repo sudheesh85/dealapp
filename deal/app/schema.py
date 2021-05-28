@@ -41,11 +41,11 @@ class Age_Limit(graphene.Enum):
     D = '51-60'
     E = '61-Above'
 class Rating(graphene.Enum):
-    1 = '*'
-    2 = '**'
-    3 = '***'
-    4 = '****'
-    5 = '*****'
+    star1 = '*'
+    star2 = '**'
+    star3 = '***'
+    star4 = '****'
+    star5 = '*****'
 
 class UserDealType(DjangoObjectType):
     class Meta:
