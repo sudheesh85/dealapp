@@ -3,7 +3,7 @@ import graphene
 from graphene import relay,ObjectType, Schema,Mutation
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django import DjangoObjectType
-from app.models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product,Deal_scratch,User_Deal
+from .models import User,Interest,Device,Yesdeal,Branch,Vendor,Region,Area,Shared_coin_history,User_Vendor,Images,Product,Deal_scratch,User_Deal,Review_Rating
 from .userid_gen import uid,otp
 from .passwd_gen import tok,qr
 from datetime import datetime as dt
@@ -47,6 +47,11 @@ class Rating(graphene.Enum):
     star4 = '****'
     star5 = '*****'
 
+class RatingType(DjangoObjectType):
+    class Meta:
+        model = Review_Rating
+        filter_fields=[]
+        interfaces = (relay.Node,)
 class UserDealType(DjangoObjectType):
     class Meta:
         model = User_Deal
@@ -212,6 +217,8 @@ class BranchInput(graphene.InputObjectType):
 class RegionInput(graphene.InputObjectType):
     pass
 class AreaInput(graphene.InputObjectType):
+    pass
+class RatingInput(graphene.InputObjectType):
     pass
 
 class UserInput(graphene.InputObjectType):
@@ -760,6 +767,7 @@ class Query(ObjectType):
     catImages = graphene.List(ImageType,category = graphene.String(),provider=graphene.String())
     vendor_product = graphene.List(ProductType,vendor = graphene.String())
     get_user_deal = graphene.List(UserDealType,user=graphene.String(),deal=graphene.String())
+    get_rating = DjangoFilterConnectionField(RatingType)
     all_user=DjangoFilterConnectionField(UserType)
     all_interest=DjangoFilterConnectionField(InterestType)
     all_device=DjangoFilterConnectionField(DeviceType)

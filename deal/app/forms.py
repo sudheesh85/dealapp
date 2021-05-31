@@ -6,7 +6,8 @@ from prettyjson import PrettyJSONWidget
 from django import forms
 from django.forms import fields, models,ModelForm
     
-
+#class rating_Form(ModelForm):
+    
 class deal_Form(ModelForm):
     
     deal_preference = forms.MultipleChoiceField(choices=Yesdeal.DEAL_PREFERENCE)#, widget=forms.SelectMultiple)

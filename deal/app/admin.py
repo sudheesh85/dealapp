@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history,Product,Images,Deal_scratch
+from .models import Interest,User,Vendor,Device,Global,Yesdeal,Branch,User_Vendor,User_Deal,Region,Area,Shared_coin_history,Product,Images,Deal_scratch,Review_Rating
 from .forms import deal_Form
 from multiselectfield import MultiSelectFormField
 from .sms import sms
@@ -27,6 +27,11 @@ from .fcm import FCM
 
 #def categories(instance):
     #return ', '.join(instance.categories)
+@admin.register(Review_Rating)
+class RatingAdmin(admin.ModelAdmin):
+    #form = rating_Form
+    list_dispaly = ('rating','rating_str')
+    #pass
 @admin.register(Deal_scratch)
 class DealScratchAdmin(admin.ModelAdmin):
     pass
